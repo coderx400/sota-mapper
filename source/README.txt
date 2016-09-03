@@ -11,6 +11,12 @@ is obtained from the SotA log files).
 It is necessary to manually use the /loc command in game in order to update the
 player position on the map.
 
+Initially there's only a single map data file for the "East Perennial Trail"
+adventure map.  So to see this in action without creating any additional data,
+you'll need to go into that zone and type /loc while running the app.  The idea
+is that you can create your own map data .csv files with items of interest that
+you discover on other maps.
+
 --- SYSTEM REQUIREMENTS --------------------------------------------------------
 
 Windows 7 or later
