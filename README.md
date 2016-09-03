@@ -39,7 +39,8 @@ For example, suppose the /loc command printed out the below.  In this case,
 there should be a file "data/maps/Novia_R1_City_Soltown.csv" which contains
 a list of items for that map.
 
-```Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)
+```
+Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)
 ```
 
 The map .csv file contains name and position for each item to be shown on the
@@ -48,7 +49,8 @@ they will be shown on the map (although you need to exit and restart the
 application to show changes to the .csv file).  Here are some examples of items
 in a map .csv file.  An example file is provided also as a starting point.
 
-```Name,X,Y,Z
+```
+Name,X,Y,Z
 Cotton,-93.2,19.1,21.8
 Bear Cave,-88,18.8,-88.9
 Mandrake,-53.8,18.5,3.5
