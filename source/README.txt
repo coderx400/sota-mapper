@@ -8,17 +8,8 @@ SotAMapper is a tool for SotA which uses a list of "items of interest" in a .csv
 file and renders them graphically along with the current player position (which
 is obtained from the SotA log files).
 
-It is necessary to manually use the /loc command in game in order to update the
-player position on the map.
-
-Initially there's only a single map data file for the "East Perennial Trail"
-adventure map.  So to see this in action without creating any additional data,
-you'll need to go into that zone and type /loc while running the app.  The idea
-is that you can create your own map data .csv files with items of interest that
-you discover on other maps.
-
-If you create your own files and would like them included in a future update,
-feel free to send them to coder1024@gmail.com and I will include them.
+It is necessary to manually use the /loc command in game once each time the
+player enters a map for which there is a map data .csv file to sync.
 
 --- SYSTEM REQUIREMENTS --------------------------------------------------------
 
@@ -78,3 +69,7 @@ of the item in the map data .csv file, then the image will be shown instead.
 2016.09.03, v1.0
 - initial release
 
+2016.09.04, v1.1
+- player position updates automatically on map while in a map for which there is
+  a map data .csv file
+- when first entering a map, it is necessary to do 1 manual /loc to sync

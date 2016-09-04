@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows.Documents;
 
 namespace SotAMapper
 {
@@ -41,20 +42,40 @@ namespace SotAMapper
 
         private void Worker()
         {
-            var tmpFile = Path.Combine(Globals.LogDir, Globals.LogWatcherTempFileName);
+            var logTmpFile = Path.Combine(Globals.LogDir, Globals.TempFileName);
 
             // regex used to match /loc output lines in the log file
-            var locRE = new Regex(@"^\[.+\] +Area: +(.+) +\((.+)\) +Loc: +\((.+), *(.+), *(.+)\)");
+            var locRE = new Regex(@"^\[(.+)\] +Area: +(.+) +\((.+)\) +Loc: +\((.+), *(.+), *(.+)\)");
+
+            // regex used to match current player data content
+            var cpdRE = new Regex(@"^PlayerLoc: (.+), (.+), (.+).*");
+
+            // regex used to match area transitions
+            var areaChangeRE = new Regex(@"^\[(.+)\] Entering (.+) from (.+)");
 
             string lastLoadedLogFile = null;
             DateTime lastLoadedLogFileTime = default(DateTime);
 
+            PlayerData playerData = null;
+            DateTime? playerDataAreaNameTime = null;
+            DateTime? playerDataMapNameTime = null;
+            DateTime? playerDataLocTime = null;
+
             PlayerData lastReportedPlayerData = null;
+
+            string lastLoadedCPDFile = null;
+            DateTime lastLoadedCPDFileTime = default(DateTime);
 
             while (true)
             {
                 try
                 {
+                    bool playerDataChanged = false;
+
+                    //
+                    // check SotA log files
+                    //
+
                     string latestModifiedLogFile = null;
                     DateTime latestModifiedLogFileTime = default(DateTime);
 
@@ -82,10 +103,10 @@ namespace SotAMapper
                             lastLoadedLogFileTime = latestModifiedLogFileTime;
 
                             // copy to temp file
-                            File.Copy(latestModifiedLogFile,tmpFile,true);
+                            File.Copy(latestModifiedLogFile, logTmpFile, true);
 
                             // load temp file
-                            var lines = File.ReadAllLines(tmpFile);
+                            var lines = File.ReadAllLines(logTmpFile);
                             if (lines?.Length > 0)
                             {
                                 // read backwards through lines in log
@@ -93,33 +114,107 @@ namespace SotAMapper
                                 {
                                     var line = lines[i];
 
+                                    // if this is an area change output line
+                                    var mAC = areaChangeRE.Match(line);
+                                    if (mAC?.Success ?? false)
+                                    {
+                                        var dateTimeStr = mAC.Groups[1].Value;
+                                        var newAreaName = mAC.Groups[2].Value;
+                                        var oldAreaName = mAC.Groups[3].Value;
+
+                                        DateTime dateTime;
+                                        if (DateTime.TryParse(dateTimeStr, out dateTime))
+                                        {
+                                            // area change updates the area name and nulls out the map name
+                                            // since we know map has changed, but don't know the new map name
+
+                                            if (playerData == null)
+                                            {
+                                                playerData = new PlayerData(newAreaName, null, null);
+                                                playerDataAreaNameTime = dateTime;
+                                                playerDataMapNameTime = dateTime;
+                                                playerDataLocTime = dateTime;
+                                                playerDataChanged = true;
+                                            }
+                                            else
+                                            {
+                                                if ((playerDataAreaNameTime == null) ||
+                                                    (dateTime > playerDataAreaNameTime))
+                                                {
+                                                    playerData = new PlayerData(newAreaName, playerData.MapName, playerData.Loc);
+                                                    playerDataAreaNameTime = dateTime;
+                                                    playerDataChanged = true;
+                                                }
+
+                                                if ((playerDataMapNameTime == null) ||
+                                                    (dateTime > playerDataMapNameTime))
+                                                {
+                                                    playerData = new PlayerData(playerData.AreaName, null, playerData.Loc);
+                                                    playerDataMapNameTime = dateTime;
+                                                    playerDataChanged = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
                                     // if this is a /loc output line
                                     var m = locRE.Match(line);
                                     if (m?.Success ?? false)
                                     {
-                                        var areaName = m.Groups[1].Value;
-                                        var mapName = m.Groups[2].Value;
-                                        var xStr = m.Groups[3].Value;
-                                        var yStr = m.Groups[4].Value;
-                                        var zStr = m.Groups[5].Value;
+                                        var dateTimeStr = m.Groups[1].Value;
+                                        var areaName = m.Groups[2].Value;
+                                        var mapName = m.Groups[3].Value;
+                                        var xStr = m.Groups[4].Value;
+                                        var yStr = m.Groups[5].Value;
+                                        var zStr = m.Groups[6].Value;
 
+                                        DateTime dateTime;
                                         float x, y, z;
-                                        if (float.TryParse(xStr, out x) &&
+                                        if (DateTime.TryParse(dateTimeStr, out dateTime) &&
+                                            float.TryParse(xStr, out x) &&
                                             float.TryParse(yStr, out y) &&
                                             float.TryParse(zStr, out z))
                                         {
-                                            var playerData = new PlayerData(areaName, mapName, new MapCoord(x, y, z));
+                                            // /loc output line replaces all fields (name and cood)
 
-                                            // if player data has never been reported or if it has changed since we last
-                                            // reported it, then notify listeners of the change
-                                            if ((lastReportedPlayerData == null) ||
-                                                !lastReportedPlayerData.Equals(playerData))
+                                            if (playerData == null)
                                             {
-                                                lastReportedPlayerData = playerData;
+                                                playerData = new PlayerData(areaName, mapName, new MapCoord(x, y, z));
+                                                playerDataAreaNameTime = dateTime;
+                                                playerDataMapNameTime = dateTime;
+                                                playerDataLocTime = dateTime;
+                                                playerDataChanged = true;
+                                            }
+                                            else
+                                            {
+                                                if ((playerDataAreaNameTime == null) ||
+                                                    (dateTime > playerDataAreaNameTime))
+                                                {
+                                                    playerData = new PlayerData(areaName, playerData.MapName, playerData.Loc);
+                                                    playerDataAreaNameTime = dateTime;
+                                                    playerDataChanged = true;
+                                                }
 
-                                                OnPlayerDataChanged(playerData);
+                                                if ((playerDataMapNameTime == null) ||
+                                                    (dateTime > playerDataMapNameTime))
+                                                {
+                                                    playerData = new PlayerData(playerData.AreaName, mapName, playerData.Loc);
+                                                    playerDataMapNameTime = dateTime;
+                                                    playerDataChanged = true;
+                                                }
+
+                                                if ((playerDataLocTime == null) ||
+                                                    (dateTime > playerDataLocTime))
+                                                {
+                                                    playerData = new PlayerData(playerData.AreaName, playerData.MapName, new MapCoord(x,y,z));
+                                                    playerDataLocTime = dateTime;
+                                                    playerDataChanged = true;
+                                                }
                                             }
 
+                                            // since /loc output includes all fields in player data, no need to
+                                            // keep searching backwards through the log file as this would invalidate
+                                            // any prior data
                                             break;
                                         }
                                     }
@@ -127,7 +222,95 @@ namespace SotAMapper
                             }
 
                             // delete temp file
-                            File.Delete(tmpFile);
+                            File.Delete(logTmpFile);
+                        }
+                    }
+
+                    //
+                    // check CurrentPlayerData file in SotA install dir
+                    //
+
+                    string latestModifiedCPDFile = null;
+                    DateTime latestModifiedCPDFileTime = default(DateTime);
+                    string cpdTempFile = null;
+
+                    foreach (var instDir in Globals.SotAInstallDirs)
+                    {
+                        var cpdFile = Path.Combine(instDir, Globals.CPDFileName);
+                        if (File.Exists(cpdFile))
+                        {
+                            var lastModTime = File.GetLastWriteTime(cpdFile);
+
+                            if ((latestModifiedCPDFile == null) ||
+                                (lastModTime > latestModifiedCPDFileTime))
+                            {
+                                latestModifiedCPDFile = cpdFile;
+                                latestModifiedCPDFileTime = lastModTime;
+                                cpdTempFile = Path.Combine(instDir, Globals.TempFileName);
+                            }
+                        }
+                    }
+
+                    if (latestModifiedCPDFile != null)
+                    {
+                        if ((lastLoadedCPDFile == null) ||
+                            (latestModifiedCPDFileTime > lastLoadedCPDFileTime))
+                        {
+                            lastLoadedCPDFile = latestModifiedCPDFile;
+                            lastLoadedCPDFileTime = latestModifiedCPDFileTime;
+
+                            File.Copy(latestModifiedCPDFile, cpdTempFile);
+
+                            var cpdContent = File.ReadAllText(cpdTempFile);
+
+                            var m = cpdRE.Match(cpdContent);
+                            if (m?.Success ?? false)
+                            {
+                                var xStr = m.Groups[1].Value;
+                                var yStr = m.Groups[2].Value;
+                                var zStr = m.Groups[3].Value;
+
+                                float x, y, z;
+                                if (float.TryParse(xStr, out x) &&
+                                    float.TryParse(yStr, out y) &&
+                                    float.TryParse(zStr, out z))
+                                {
+                                    // current player data file updates only location
+
+                                    if (playerData == null)
+                                    {
+                                        playerData = new PlayerData(null, null, new MapCoord(x,y,z));
+                                        playerDataAreaNameTime = latestModifiedCPDFileTime;
+                                        playerDataMapNameTime = latestModifiedCPDFileTime;
+                                        playerDataLocTime = latestModifiedCPDFileTime;
+                                        playerDataChanged = true;
+                                    }
+                                    else
+                                    {
+                                        if ((playerDataLocTime == null) ||
+                                            (latestModifiedCPDFileTime > playerDataLocTime))
+                                        {
+                                            playerData = new PlayerData(playerData.AreaName, playerData.MapName, new MapCoord(x, y, z));
+                                            playerDataLocTime = latestModifiedCPDFileTime;
+                                            playerDataChanged = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            File.Delete(cpdTempFile);
+                        }
+                    }
+
+                    // if player data has changed, notify
+                    if (playerDataChanged && (playerData != null))
+                    {
+                        if ((lastReportedPlayerData == null) ||
+                            !lastReportedPlayerData.Equals(playerData))
+                        {
+                            lastReportedPlayerData = new PlayerData(playerData);
+
+                            OnPlayerDataChanged(playerData);
                         }
                     }
                 }

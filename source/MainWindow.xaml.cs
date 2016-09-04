@@ -121,7 +121,8 @@ namespace SotAMapper
                     "For example, if /loc outputs the below:\n" +
                     "Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)\n" +
                     "there should be a file, \"data/maps/Novia_R1_City_Soltown.csv\" with map data\n\n" +
-                    "Currently player location on map only updates when /loc is manually used in game.\n\n" +
+                    "Player location on map will update automatically, however it is necessary to\n" +
+                    "manually use the /loc command once each time when entering a map to sync current map.\n\n" +                    
                     "Map items are rendered as text labels unless a PNG file exists in \"data/icons\" which\n" +
                     "matches the name of the item in the map .csv file\n\n" +
                     "The /loctrack command shows location on screen and makes it easier to build map files";

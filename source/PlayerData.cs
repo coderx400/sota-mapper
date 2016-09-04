@@ -15,6 +15,13 @@ namespace SotAMapper
         public string MapName { get; private set; }
         public MapCoord Loc { get; private set; }
 
+        public PlayerData(PlayerData rhs)
+        {
+            AreaName = rhs.AreaName;
+            MapName = rhs.MapName;
+            Loc = rhs.Loc;
+        }
+
         public PlayerData(string areaName, string mapName, MapCoord loc)
         {
             AreaName = areaName;
@@ -24,7 +31,7 @@ namespace SotAMapper
 
         public override string ToString()
         {
-            return $"AreaName={AreaName}, MapName={MapName}, Loc={Loc}";
+            return $"AreaName={AreaName ?? "null"}, MapName={MapName ?? "null"}, Loc=" + (Loc?.ToString() ?? "null");
         }
 
         public override bool Equals(object obj)

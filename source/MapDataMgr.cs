@@ -18,6 +18,9 @@ namespace SotAMapper
 
         public Map GetMap(string name)
         {
+            if (name == null)
+                return null;
+
             Map result = null;
             if (!_loadedMaps.TryGetValue(name, out result))
                 return null;

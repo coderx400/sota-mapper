@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace SotAMapper
 {
@@ -15,8 +18,12 @@ namespace SotAMapper
         public static string IconDir { get; private set; }
         public static string LogDir { get; private set; }
 
-        public static string LogWatcherTempFileName { get; private set; } = "_SotAMapper.tmp";
-        public static string LogFilePattern { get; private set; } = "SotAChatLog_*.txt";
+        public static readonly string TempFileName = "_SotAMapper.tmp";
+        public static readonly string LogFilePattern = "SotAChatLog_*.txt";
+        public static readonly string CPDFileName = "CurrentPlayerData.txt";
+
+        private static List<string> _sotaInstallDirs; 
+        public static IEnumerable<string> SotAInstallDirs => _sotaInstallDirs;
 
         static Globals()
         {
@@ -27,6 +34,66 @@ namespace SotAMapper
             IconDir = System.IO.Path.Combine(DataDir, "icons");
             var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             LogDir = Path.Combine(appDataDir, "Portalarium", "Shroud of the Avatar", "ChatLogs");
+
+            _sotaInstallDirs = FindSotAInstallDirs();
+        }
+
+        private static List<string> FindSotAInstallDirs()
+        {
+            var result = new List<string>();
+
+            var baseKeys = new List<RegistryKey>
+            {
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32),
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64),
+            };
+            try
+            {
+                foreach (var baseKey in baseKeys)
+                {
+                    const string uninstKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+                    using (var uninstKey = baseKey.OpenSubKey(uninstKeyPath))
+                    {
+                        if (uninstKey != null)
+                        {
+                            var appKeyNames = uninstKey.GetSubKeyNames();
+                            if (appKeyNames != null)
+                            {
+                                foreach (var appKeyName in appKeyNames)
+                                {
+                                    using (var appKey = uninstKey.OpenSubKey(appKeyName))
+                                    {
+                                        if (appKey != null)
+                                        {
+                                            var displayName = appKey.GetValue("DisplayName") as string;
+                                            var installDir = appKey.GetValue("InstallLocation") as string;
+
+                                            if ((displayName != null) &&
+                                                (installDir != null))
+                                            {
+                                                if ((string.Compare(displayName, "Shroud of the Avatar", true) == 0) ||
+                                                    (string.Compare(displayName, "Shroud of the Avatar: Forsaken Virtues") == 0))
+                                                {
+                                                    result.Add(installDir);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                foreach (var baseKey in baseKeys)
+                {
+                    baseKey?.Dispose();
+                }
+            }
+
+            return result;
         }
     }
 }
