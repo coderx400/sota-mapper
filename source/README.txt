@@ -11,6 +11,15 @@ is obtained from the SotA log files).
 It is necessary to manually use the /loc command in game once each time the
 player enters a map for which there is a map data .csv file to sync.
 
+Initially there's only a single map data file for the "East Perennial Trail"
+adventure map.  So to see this in action without creating any additional data,
+you'll need to go into that zone and type /loc while running the app.  The idea
+is that you can create your own map data .csv files with items of interest that
+you discover on other maps.
+
+If you create your own files and would like them included in a future update,
+feel free to send them to coder1024@gmail.com and I will include them.
+
 --- SYSTEM REQUIREMENTS --------------------------------------------------------
 
 Windows 7 or later
