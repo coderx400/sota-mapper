@@ -7,9 +7,14 @@
         mc:Ignorable="d"
         Title="SotAMapper" Width="800" Height="600" MinWidth="800" MinHeight="600" SizeChanged="Window_SizeChanged">
     <DockPanel>
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem>
-                <TextBlock Name="StatusBarTextBlock" FontSize="12pt" FontWeight="Bold"></TextBlock>
+        <StatusBar DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
+            <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock Name="StatusBarTextBlock" FontSize="12pt" FontWeight="Bold">Status</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <Hyperlink FontSize="12pt" FontWeight="Bold" NavigateUri="http://goo.gl/pB0QCQ" RequestNavigate="Hyperlink_RequestNavigate">
+                    Discussion Thread on SotA Forums
+                </Hyperlink>
             </StatusBarItem>
         </StatusBar>
         <Canvas Name="MainCanvas" Background="Black" />

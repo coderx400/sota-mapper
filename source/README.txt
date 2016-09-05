@@ -88,3 +88,4 @@ NEXT RELEASE
 - added status bar which shows name of map item on mouse over for items which
   render as images (due to the presence of a .PNG with matching name in the
   data/icons folder)
+- added link to forum discussion thread in status bar

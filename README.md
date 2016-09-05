@@ -86,3 +86,4 @@ of the item in the map data .csv file, then the image will be shown instead.
 - player position updates automatically on map while in a map for which there is
   a map data .csv file
 - when first entering a map, it is necessary to do 1 manual /loc to sync
+- added link to forum discussion thread in status bar
