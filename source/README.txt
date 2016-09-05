@@ -24,11 +24,12 @@ feel free to send them to coder1024@gmail.com and I will include them.
 
 Windows 7 or later
 .NET 4.5.2 Framework
-   - can download this from the below or just search for .NET 4.5.2 runtime
+  - can download this from the below or just search for .NET 4.5.2 runtime
      https://www.microsoft.com/en-us/download/details.aspx?id=42643
 
 - SotAMapper is a C# .NET application created in Visual Studio 2015 (v14)
-- Full source code for the application is included
+- Full source code for the application is included and is also posted on
+  GitHub at https://github.com/coderx400/sota-mapper
 
 --- MAP DATA FILES -------------------------------------------------------------
 
