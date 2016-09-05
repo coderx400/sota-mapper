@@ -89,3 +89,6 @@ NEXT RELEASE
   render as images (due to the presence of a .PNG with matching name in the
   data/icons folder)
 - added link to forum discussion thread in status bar
+- data updates
+  - added lamp post items and icon to Novia_R1_Swamp02_Road map
+  - added Novia_R6_Hills02_HighValeVillage_After map

@@ -86,4 +86,12 @@ of the item in the map data .csv file, then the image will be shown instead.
 - player position updates automatically on map while in a map for which there is
   a map data .csv file
 - when first entering a map, it is necessary to do 1 manual /loc to sync
+
+NEXT RELEASE
+- added status bar which shows name of map item on mouse over for items which
+  render as images (due to the presence of a .PNG with matching name in the
+  data/icons folder)
 - added link to forum discussion thread in status bar
+- data updates
+  - added lamp post items and icon to Novia_R1_Swamp02_Road map
+  - added Novia_R6_Hills02_HighValeVillage_After map
