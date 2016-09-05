@@ -31,6 +31,8 @@ namespace SotAMapper
         private Map _lastMap;
         private PlayerData _lastPlayerData;
 
+        private Dictionary<object, MapItem> _uiElementToMapItemMap; 
+
         public MainWindow()
         {
             InitializeComponent();
@@ -85,6 +87,7 @@ namespace SotAMapper
         /// </summary>
         private void RenderMap(Map map, PlayerData playerData)
         {
+            _uiElementToMapItemMap = new Dictionary<object, MapItem>();
             double canvasX = 0, canvasY = 0;
             TextBlock label = null;
 
@@ -162,8 +165,12 @@ namespace SotAMapper
                         Canvas.SetLeft(img, canvasX - (img.ActualWidth / 2.0));
                         Canvas.SetTop(img, canvasY - (img.ActualHeight / 2.0));
                         MainCanvas.Children.Add(img);
+
+                        _uiElementToMapItemMap[img] = mapItem;
+                        img.MouseEnter += new MouseEventHandler(OnMouseEnter);
+                        img.MouseLeave += new MouseEventHandler(OnMouseLeave);
                     }
-                    
+
                     // otherwise, just use a text label
                     else
                     {
@@ -192,6 +199,7 @@ namespace SotAMapper
 
                 // render player using player icon if one exists
                 var playerIconPath = System.IO.Path.Combine(Globals.IconDir, "Player.png");
+                UIElement playerOb = null;
                 if (File.Exists(playerIconPath))
                 {
                     var img = new Image();
@@ -206,21 +214,25 @@ namespace SotAMapper
                     Canvas.SetLeft(img, canvasX - (img.ActualWidth / 2.0));
                     Canvas.SetTop(img, canvasY - (img.ActualHeight / 2.0));
                     MainCanvas.Children.Add(img);
+                    playerOb = img;
                 }
-
                 // otherwise render player using text
                 else
                 {
                     label = new TextBlock();
                     label.Text = "*";
                     label.Foreground = lineBrush;
-                    label.FontSize = 40;
+                    label.FontSize = 50;
                     label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                     label.Arrange(new Rect(label.DesiredSize));
                     Canvas.SetLeft(label, canvasX - (label.ActualWidth / 2.0));
                     Canvas.SetTop(label, canvasY - (label.ActualHeight / 2.0));
                     MainCanvas.Children.Add(label);
+                    playerOb = label;
                 }
+                _uiElementToMapItemMap[playerOb] = new MapItem("Player Position",playerData.Loc);
+                playerOb.MouseEnter += new MouseEventHandler(OnMouseEnter);
+                playerOb.MouseLeave += new MouseEventHandler(OnMouseLeave);
 
                 // render the compass image
                 var compassIconPath = System.IO.Path.Combine(Globals.IconDir, "CompassDirections.png");
@@ -265,6 +277,26 @@ namespace SotAMapper
             Canvas.SetLeft(label, MainCanvas.ActualWidth - label.ActualWidth - windowMargin);
             Canvas.SetTop(label, MainCanvas.ActualHeight - label.ActualHeight - windowMargin);
             MainCanvas.Children.Add(label);
+        }
+
+        public void OnMouseEnter(object sender, RoutedEventArgs e)
+        {
+            MapItem mapItem = null;
+            if (!(_uiElementToMapItemMap?.TryGetValue(sender, out mapItem) ?? false))
+                return;
+            if (mapItem == null)
+                return;
+            StatusBarTextBlock.Text = mapItem.Name;
+        }
+
+        public void OnMouseLeave(object sender, RoutedEventArgs e)
+        {
+            MapItem mapItem = null;
+            if (!(_uiElementToMapItemMap?.TryGetValue(sender, out mapItem) ?? false))
+                return;
+            if (mapItem == null)
+                return;
+            StatusBarTextBlock.Text = "";
         }
     }
 }
