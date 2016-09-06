@@ -22,7 +22,7 @@ namespace SotAMapper
                 return null;
 
             Map result = null;
-            if (!_loadedMaps.TryGetValue(name, out result))
+            if (!_loadedMaps.TryGetValue(name.ToUpper(), out result))
                 return null;
             return result;
         }
@@ -40,8 +40,8 @@ namespace SotAMapper
                     if (!map.Load(mapFile))
                         continue;
 
-                    _loadedMaps[map.Name] = map;
-                    //Debug.WriteLine(map);
+                    _loadedMaps[map.Name.ToUpper()] = map;
+                    Debug.WriteLine(map);
                 }
             }
             catch (Exception)
