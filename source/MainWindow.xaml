@@ -9,7 +9,7 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem HorizontalAlignment="Left">
-                <TextBlock Name="StatusBarTextBlock" FontSize="12pt" FontWeight="Bold">Status</TextBlock>
+                <TextBlock Name="StatusBarTextBlock" FontSize="12pt" FontWeight="Bold"></TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <Hyperlink FontSize="12pt" FontWeight="Bold" NavigateUri="http://goo.gl/pB0QCQ" RequestNavigate="Hyperlink_RequestNavigate">
