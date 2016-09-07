@@ -94,3 +94,4 @@ NEXT RELEASE
 - added link to forum discussion thread in status bar
 - data updates (maps, icons)
 - fixed upper/lower case bug when case of map file didn't match what SotA reported
+- fixed crash when map data .csv file was empty (no items)

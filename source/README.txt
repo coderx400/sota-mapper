@@ -22,11 +22,10 @@ feel free to send them to coder1024@gmail.com and I will include them.
 
 --- SYSTEM REQUIREMENTS --------------------------------------------------------
 
-Windows 7 or later
-.NET 4.5.2 Framework
+- Windows 7 or later
+- .NET 4.5.2 Framework
   - can download this from the below or just search for .NET 4.5.2 runtime
-     https://www.microsoft.com/en-us/download/details.aspx?id=42643
-
+    https://www.microsoft.com/en-us/download/details.aspx?id=42643
 - SotAMapper is a C# .NET application created in Visual Studio 2015 (v14)
 - Full source code for the application is included and is also posted on
   GitHub at https://github.com/coderx400/sota-mapper
@@ -41,7 +40,9 @@ For example, suppose the /loc command printed out the below.  In this case,
 there should be a file "data/maps/Novia_R1_City_Soltown.csv" which contains
 a list of items for that map.
 
-   Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)
+```
+Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)
+```
 
 The map .csv file contains name and position for each item to be shown on the
 map.  As you discover items on a map, you can add them to the .csv file and
@@ -49,10 +50,12 @@ they will be shown on the map (although you need to exit and restart the
 application to show changes to the .csv file).  Here are some examples of items
 in a map .csv file.  An example file is provided also as a starting point.
 
-   Name,X,Y,Z
-   Cotton,-93.2,19.1,21.8
-   Bear Cave,-88,18.8,-88.9
-   Mandrake,-53.8,18.5,3.5
+```
+Name,X,Y,Z
+Cotton,-93.2,19.1,21.8
+Bear Cave,-88,18.8,-88.9
+Mandrake,-53.8,18.5,3.5
+```
 
 Note that this tool only uses the X and Z values, but all (X, Y, and Z) are
 expected in the file.  This is done to avoid confusion between going from what
@@ -91,3 +94,4 @@ NEXT RELEASE
 - added link to forum discussion thread in status bar
 - data updates (maps, icons)
 - fixed upper/lower case bug when case of map file didn't match what SotA reported
+- fixed crash when map data .csv file was empty (no items)
