@@ -58,7 +58,7 @@ namespace SotAMapper
 
         public bool Init()
         {
-            if ((_map == null) || (_canvas == null))
+            if ((_map == null) || (_canvas == null) || (_map.MinLoc == null) || (_map.MaxLoc == null))
                 return false;
 
             // determine extents of map data
