@@ -97,12 +97,58 @@ namespace SotAMapper
             // first, clear everything off the canvas
             MainCanvas.Children.Clear();
 
-            // do we have valid data to render?
+            // holds error strings for rendering in case we don't have valid data to render
+            var errors = new List<string>();
 
+            // do we have valid data to render?
             bool validData = true;
 
-            if ((map == null) || (playerData == null))
+            if (playerData == null)
+            {
+                errors.Add("no player data, try using /loc");
                 validData = false;
+            }
+            else
+            {
+                if ((playerData.MapName?.Length ?? 0) == 0)
+                {
+                    errors.Add("unable to determine player map, try using /loc");
+                    validData = false;
+                }
+
+                if (playerData.Loc == null)
+                {
+                    errors.Add("unable to determine player position, try using /loc");
+                    validData = false;
+                }
+            }
+
+            if (map == null)
+            {
+                if ((playerData?.MapName?.Length ?? 0) > 0)
+                {
+                    errors.Add("no .csv file for current map, compare /loc output to data/maps files");
+                    validData = false;
+                }
+            }
+            else
+            {
+                if ((map.MinLoc == null) || (map.MaxLoc == null))
+                {
+                    errors.Add("empty map .csv file, please add some entries");
+                    validData = false;
+                }
+            }
+
+            if ((map == null) ||
+                (map?.MinLoc == null) ||
+                (map?.MaxLoc == null) ||
+                (playerData == null) ||
+                ((playerData?.MapName?.Length ?? 0) == 0) ||
+                (playerData?.Loc == null))
+            {
+                validData = false;
+            }
 
             IEnumerable<MapCoord> otherData = null;
             if (playerData != null)
@@ -115,11 +161,15 @@ namespace SotAMapper
             var lineColor = Color.FromRgb(236, 142, 0);
             var lineBrush = new SolidColorBrush(lineColor);
 
+            // color/brush used for error messages
+            var errColor = Color.FromRgb(255, 0, 0);
+            var errBrush = new SolidColorBrush(errColor);
+
             // no valid data, just show help text
             if (!validData)
             {
                 var helpText =
-                    "* * * NO DATA * * *\n\n" +
+                    "* * * NO DATA * * *\n" +
                     "Type /loc in game and verify reported map name matches a file in \"data/maps\"\n\n" +
                     "For example, if /loc outputs the below:\n" +
                     "Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)\n" +
@@ -138,6 +188,18 @@ namespace SotAMapper
                 label.Arrange(new Rect(label.DesiredSize));
                 Canvas.SetLeft(label, (MainCanvas.ActualWidth / 2.0) - (label.ActualWidth / 2.0));
                 Canvas.SetTop(label, conv.CanvasMarginY);
+                MainCanvas.Children.Add(label);
+
+                var errorsCombined = string.Join("\n", errors);
+                label = new TextBlock();
+                label.Text = errorsCombined;
+                label.Foreground = errBrush;
+                label.FontSize = 18;
+                label.TextAlignment = TextAlignment.Center;
+                label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                label.Arrange(new Rect(label.DesiredSize));
+                Canvas.SetLeft(label, (MainCanvas.ActualWidth / 2.0) - (label.ActualWidth / 2.0));
+                Canvas.SetTop(label, MainCanvas.ActualHeight - conv.CanvasMarginY - label.ActualHeight);
                 MainCanvas.Children.Add(label);
             }
 
