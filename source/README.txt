@@ -93,5 +93,8 @@ NEXT RELEASE
   data/icons folder)
 - added link to forum discussion thread in status bar
 - data updates (maps, icons)
-- fixed upper/lower case bug when case of map file didn't match what SotA reported
+- fixed upper/lower case bug when case of map file didn't match what was
+  reported by SotA
 - fixed crash when map data .csv file was empty (no items)
+- added descriptive error messages which render in red when the "NO DATA"
+  condition occurs to help in identifying why a map is not showing
