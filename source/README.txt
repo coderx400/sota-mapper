@@ -11,14 +11,14 @@ is obtained from the SotA log files).
 It is necessary to manually use the /loc command in game once each time the
 player enters a map for which there is a map data .csv file to sync.
 
-Initially there's only a single map data file for the "East Perennial Trail"
-adventure map.  So to see this in action without creating any additional data,
-you'll need to go into that zone and type /loc while running the app.  The idea
-is that you can create your own map data .csv files with items of interest that
-you discover on other maps.
+Initially the set of map data files is pretty limited.  The intent is that over
+time people will create maps and contribute them (send them to 
+coder1024@gmail.com) and they will be included in a future release.  So to see
+this in action without creating any additional data, you'll need to go into a
+map for which there is a map data file and type /loc while running the app.
 
-If you create your own files and would like them included in a future update,
-feel free to send them to coder1024@gmail.com and I will include them.
+The idea also is that it provides an easy way for you to record locations
+while playing on a map and see them graphically.
 
 --- SYSTEM REQUIREMENTS --------------------------------------------------------
 
@@ -79,22 +79,22 @@ of the item in the map data .csv file, then the image will be shown instead.
 # History
 ################################################################################
 
-2016.09.03, v1.0
-- initial release
+NEXT RELEASE
+- added status bar which shows name of map item on mouse over for items which
+  render as images (due to the presence of a .PNG with matching name in the
+  data/icons folder)
+- added link to forum discussion thread in status bar
+- data updates (maps, icons), added map for Highvale
+- fixed upper/lower case bug when case of map file didn't match what was
+  reported by SotA
+- fixed crash when map data .csv file was empty (no items)
+- added descriptive error messages which render in red when the "NO DATA"
+  condition occurs to help in identifying why a map is not showing
 
 2016.09.04, v1.1
 - player position updates automatically on map while in a map for which there is
   a map data .csv file
 - when first entering a map, it is necessary to do 1 manual /loc to sync
 
-NEXT RELEASE
-- added status bar which shows name of map item on mouse over for items which
-  render as images (due to the presence of a .PNG with matching name in the
-  data/icons folder)
-- added link to forum discussion thread in status bar
-- data updates (maps, icons)
-- fixed upper/lower case bug when case of map file didn't match what was
-  reported by SotA
-- fixed crash when map data .csv file was empty (no items)
-- added descriptive error messages which render in red when the "NO DATA"
-  condition occurs to help in identifying why a map is not showing
+2016.09.03, v1.0
+- initial release
