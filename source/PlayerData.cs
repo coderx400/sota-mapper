@@ -31,7 +31,7 @@ namespace SotAMapper
 
         public override string ToString()
         {
-            return $"AreaName={AreaName ?? "null"}, MapName={MapName ?? "null"}, Loc=" + (Loc?.ToString() ?? "null");
+            return $"Area={AreaName ?? "null"}, Map={MapName ?? "null"}, Loc=" + (Loc?.ToString() ?? "null");
         }
 
         public override bool Equals(object obj)
