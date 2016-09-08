@@ -79,7 +79,7 @@ of the item in the map data .csv file, then the image will be shown instead.
 # History
 ################################################################################
 
-NEXT RELEASE
+2016.09.08, v1.2
 - added status bar which shows name of map item on mouse over for items which
   render as images (due to the presence of a .PNG with matching name in the
   data/icons folder)
