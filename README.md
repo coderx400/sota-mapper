@@ -82,6 +82,8 @@ of the item in the map data .csv file, then the image will be shown instead.
 NEXT VERSION
 - added TopMost checkbox, checking it will attempt to keep the window on top
   of other windows
+- added settings.ini file which is created when run (if it doesn't exist) and
+  which will persist settings (like TopMost) between runs
 
 2016.09.08, v1.2
 - added status bar which shows name of map item on mouse over for items which

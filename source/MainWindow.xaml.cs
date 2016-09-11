@@ -52,6 +52,26 @@ namespace SotAMapper
             _playerDataWatcher = new PlayerDataWatcher();
             _playerDataWatcher.PlayerDataChanged += OnPlayerDataChanged;
             _playerDataWatcher.Start();
+
+            // app settings
+            LoadSettings();
+            SaveSettings();
+        }
+
+        private void LoadSettings()
+        {
+            var ini = new IniFile(Globals.SettingsFilePath);
+
+            var topMostFlag = string.Compare(ini.Read("TopMost", "false"), "true", true) == 0;
+            Topmost = topMostFlag;
+            TopMostCheckbox.IsChecked = topMostFlag;
+        }
+
+        private void SaveSettings()
+        {
+            var ini = new IniFile(Globals.SettingsFilePath);
+
+            ini.Write("TopMost", Topmost ? "true" : "false");
         }
 
         /// <summary>
@@ -372,6 +392,7 @@ namespace SotAMapper
             if (sender == TopMostCheckbox)
             {
                 this.Topmost = TopMostCheckbox.IsChecked.GetValueOrDefault(false);
+                SaveSettings();
             }
         }
     }
