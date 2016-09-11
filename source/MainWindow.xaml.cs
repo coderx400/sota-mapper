@@ -366,6 +366,14 @@ namespace SotAMapper
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
+
+        private void TopMostCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == TopMostCheckbox)
+            {
+                this.Topmost = TopMostCheckbox.IsChecked.GetValueOrDefault(false);
+            }
+        }
     }
 }
 
