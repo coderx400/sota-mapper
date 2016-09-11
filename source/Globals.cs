@@ -20,6 +20,7 @@ namespace SotAMapper
 
         public static string SettingsFilePath { get; private set; }
 
+        public static readonly string AppDataDirName = "SotAMapper";
         public static readonly string SettingsFileName = "settings.ini";
         public static readonly string TempFileName = "_SotAMapper.tmp";
         public static readonly string LogFilePattern = "SotAChatLog_*.txt";
@@ -31,14 +32,18 @@ namespace SotAMapper
         static Globals()
         {
             var exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
+            var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
             ExeDir = System.IO.Path.GetDirectoryName(exePath);
             DataDir = System.IO.Path.Combine(ExeDir, "data");
             MapDir = System.IO.Path.Combine(DataDir, "maps");
             IconDir = System.IO.Path.Combine(DataDir, "icons");
-            var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             LogDir = Path.Combine(appDataDir, "Portalarium", "Shroud of the Avatar", "ChatLogs");
 
-            SettingsFilePath = System.IO.Path.Combine(ExeDir, SettingsFileName);
+            var settingsDir = System.IO.Path.Combine(appDataDir, AppDataDirName);
+            Directory.CreateDirectory(settingsDir);
+
+            SettingsFilePath = System.IO.Path.Combine(settingsDir, SettingsFileName);
 
             _sotaInstallDirs = FindSotAInstallDirs();
         }
