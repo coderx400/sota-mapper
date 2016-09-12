@@ -66,6 +66,10 @@ for completeness may help if this data were to be used in other tools also.
 When building a map .csv file, the /loctrack command can be helpful.  This
 causes the location to be continually shown on screen.
 
+You can also click the Add button in SotAMapper to add an item to the map at
+the current player location.  With this feature, there's no need to type
+in coordinate values!
+
 If you have Excel installed, you can double-click on the .csv files and edit
 them in that, just make sure to save them out as .csv if prompted.
 
