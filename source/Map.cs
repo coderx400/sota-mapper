@@ -13,6 +13,8 @@ namespace SotAMapper
     /// </summary>
     public class Map
     {
+        public string MapFilePath { get; private set; }
+
         /// <summary>
         /// Name of the map, will be the base filename of the map data file
         /// and what is reported by the /loc command
@@ -62,6 +64,7 @@ namespace SotAMapper
         {
             try
             {
+                MapFilePath = mapFile;
                 Name = Path.GetFileNameWithoutExtension(mapFile);
                 _items = new List<MapItem>();
                 MinLoc = null;
@@ -116,6 +119,22 @@ namespace SotAMapper
             }
 
             return true;
+        }
+
+        public void AddMapItem(MapItem itm)
+        {
+            try
+            {
+                using (var sw = File.AppendText(MapFilePath))
+                {
+                    sw.WriteLine(itm.Name + ", " + itm.Coord);
+                }
+
+                _items.Add(itm);
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 }

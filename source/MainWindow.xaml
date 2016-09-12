@@ -14,12 +14,15 @@
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1">
-                <TextBlock Name="StatusBarTextBlock" FontSize="12pt" FontWeight="Bold"></TextBlock>
+                <TextBlock Margin="10" Name="StatusBarTextBlock" FontSize="12pt" FontWeight="Bold">StatusTextGoesHere</TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2">
-                <CheckBox Name="TopMostCheckbox" Content="TopMost" FontSize="12pt" FontWeight="Bold" Click="TopMostCheckbox_Click" />
+                <StackPanel Orientation="Horizontal">
+                    <Button VerticalAlignment="Center" Name="AddItemAtPlayersLocationButton" Click="AddItemAtPlayerLocation_Click" HorizontalAlignment="Center" Margin="5" Padding="5" FontSize="12pt" FontWeight="Bold">Add</Button>
+                    <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" Name="TopMostCheckbox" Content="TopMost" FontSize="12pt" FontWeight="Bold" Click="TopMostCheckbox_Click" />
+                </StackPanel>
             </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="3">
+            <StatusBarItem Margin="10" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="3">
                 <Hyperlink FontSize="12pt" FontWeight="Bold" NavigateUri="http://goo.gl/pB0QCQ" RequestNavigate="Hyperlink_RequestNavigate">
                     Discussion Thread on SotA Forums
                 </Hyperlink>

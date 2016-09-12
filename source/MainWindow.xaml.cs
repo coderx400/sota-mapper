@@ -37,11 +37,18 @@ namespace SotAMapper
         {
             InitializeComponent();
 
+            StatusBarTextBlock.Text = "";
+
+            // app settings
+            LoadSettings();
+            SaveSettings();
+
             // build window title, use embedded assembly version so it can be set
             // in one place.
             var ver = Assembly.GetExecutingAssembly().GetName().Version;
             Title = "SotAMapper v" + ver.Major + "." + ver.Minor;
 
+            // initial render
             RenderMap(null, null);
 
             // load up all available map files
@@ -52,10 +59,6 @@ namespace SotAMapper
             _playerDataWatcher = new PlayerDataWatcher();
             _playerDataWatcher.PlayerDataChanged += OnPlayerDataChanged;
             _playerDataWatcher.Start();
-
-            // app settings
-            LoadSettings();
-            SaveSettings();
         }
 
         private void LoadSettings()
@@ -176,6 +179,8 @@ namespace SotAMapper
             var conv = new MapCanvasConverter(map, MainCanvas, otherData);
             if (!conv.Init())
                 validData = false;
+
+            AddItemAtPlayersLocationButton.IsEnabled = validData;
 
             // color/brush used for rendering text and other annotations
             var lineColor = Color.FromRgb(236, 142, 0);
@@ -394,6 +399,31 @@ namespace SotAMapper
                 this.Topmost = TopMostCheckbox.IsChecked.GetValueOrDefault(false);
                 SaveSettings();
             }
+        }
+
+        private void AddItemAtPlayerLocation_Click(object sender, RoutedEventArgs e)
+        {
+            if ((_lastMap == null) || (_lastPlayerData == null) ||
+                (_lastPlayerData.MapName == null) || (_lastPlayerData.Loc == null))
+            {
+                return;
+            }
+
+            var dlg = new MapItemNamePrompt();
+            dlg.Owner = this;
+
+            dlg.MapNameLabel.Content = _lastMap.Name;
+            dlg.LocLabel.Content = _lastPlayerData.Loc.ToString();
+
+            var res = dlg.ShowDialog();
+            if (!res.GetValueOrDefault())
+                return;
+
+            var itm = new MapItem(dlg.ItemNameTextBox.Text, _lastPlayerData.Loc);
+
+            _lastMap.AddMapItem(itm);
+
+            RenderMap(_lastMap, _lastPlayerData);
         }
     }
 }

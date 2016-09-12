@@ -87,6 +87,9 @@ NEXT VERSION
   file is stored in "%APPDATA%\SotAMapper"
 - fixed string formatting bug with MapCoord and spaced out values
   for readability
+- there is now an Add button which allows adding a map item at the current
+  player location to the current map file.  no more need to type in coordinate
+  values!
 
 2016.09.08, v1.2
 - added status bar which shows name of map item on mouse over for items which
