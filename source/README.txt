@@ -96,6 +96,7 @@ of the item in the map data .csv file, then the image will be shown instead.
 - there is now an Add button which allows adding a map item at the current
   player location to the current map file.  no more need to type in coordinate
   values!
+- when loading map .csv files, ignore lines with empty item names
 
 2016.09.08, v1.2
 - added status bar which shows name of map item on mouse over for items which

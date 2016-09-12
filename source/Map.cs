@@ -92,6 +92,10 @@ namespace SotAMapper
                         continue;
                     }
 
+                    var itemName = toks[0].Trim();
+                    if (itemName?.Length == 0)
+                        continue;
+
                     Utils.CheckAndSetMin(ref minX, x);
                     Utils.CheckAndSetMin(ref minY, y);
                     Utils.CheckAndSetMin(ref minZ, z);
@@ -100,7 +104,7 @@ namespace SotAMapper
                     Utils.CheckAndSetMax(ref maxY, y);
                     Utils.CheckAndSetMax(ref maxZ, z);
 
-                    var mapItem = new MapItem(toks[0], new MapCoord(x, y, z));
+                    var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
 
                     _items.Add(mapItem);
                 }
