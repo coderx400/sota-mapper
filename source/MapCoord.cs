@@ -26,7 +26,7 @@ namespace SotAMapper
 
         public override string ToString()
         {
-            return $"{X},{Y},{X}";
+            return $"{X}, {Y}, {Z}";
         }
 
         public override bool Equals(object obj)

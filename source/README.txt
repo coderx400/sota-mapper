@@ -85,6 +85,8 @@ NEXT VERSION
 - added settings.ini file which is created when run (if it doesn't exist) and
   which will persist settings (like TopMost) between runs.  The settings.ini
   file is stored in "%APPDATA%\SotAMapper"
+- fixed string formatting bug with MapCoord and spaced out values
+  for readability
 
 2016.09.08, v1.2
 - added status bar which shows name of map item on mouse over for items which
