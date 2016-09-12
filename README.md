@@ -79,12 +79,14 @@ of the item in the map data .csv file, then the image will be shown instead.
 # History
 ################################################################################
 
-NEXT VERSION
+2016.09.11, v1.3
 - added TopMost checkbox, checking it will attempt to keep the window on top
   of other windows
 - added settings.ini file which is created when run (if it doesn't exist) and
   which will persist settings (like TopMost) between runs.  The settings.ini
-  file is stored in "%APPDATA%\SotAMapper"
+  file is stored in "%APPDATA%\SotAMapper".  there is NO NEED to hand edit
+  this file, there is only 1 setting so far (the TopMost setting) and its
+  set from the UI.
 - fixed string formatting bug with MapCoord and spaced out values
   for readability
 - there is now an Add button which allows adding a map item at the current
