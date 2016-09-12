@@ -418,8 +418,15 @@ namespace SotAMapper
             var res = dlg.ShowDialog();
             if (!res.GetValueOrDefault())
                 return;
+            var mapItemName = (dlg.ItemNameTextBox.Text ?? "").Trim();
 
-            var itm = new MapItem(dlg.ItemNameTextBox.Text, _lastPlayerData.Loc);
+            if (mapItemName?.Length == 0)
+            {
+                MessageBox.Show("No name provided!  Please enter a name for the map item.");
+                return;
+            }
+
+            var itm = new MapItem(mapItemName, _lastPlayerData.Loc);
 
             _lastMap.AddMapItem(itm);
 
