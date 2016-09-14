@@ -109,9 +109,6 @@ Map Data
 # Known Issues
 ################################################################################
 
-- when using the Add button added in v1.3, the map overall extents aren't
-  re-computed, giving some strange results when building a map as you go with
-  that feature
 - you must add at least 1 map item manually in order for the Add item to be
   enabled and allow you to add more items the easy way
 - some maps seem to have reversed coordinate systems, Berek confirmed that this
@@ -137,6 +134,9 @@ Map Data
 
 NEXT VERSION
 - data updates
+- when using the Add button to add a new map item, the min/max extents of the
+  data are re-computed so the rendering doesn't get wonky as you add items when
+  building a new map
 
 2016.09.11, v1.3
 - added TopMost checkbox, checking it will attempt to keep the window on top
