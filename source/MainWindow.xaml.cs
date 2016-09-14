@@ -154,18 +154,8 @@ namespace SotAMapper
                     validData = false;
                 }
             }
-            else
-            {
-                if ((map.MinLoc == null) || (map.MaxLoc == null))
-                {
-                    errors.Add("empty map .csv file, please add some entries");
-                    validData = false;
-                }
-            }
 
             if ((map == null) ||
-                (map?.MinLoc == null) ||
-                (map?.MaxLoc == null) ||
                 (playerData == null) ||
                 ((playerData?.MapName?.Length ?? 0) == 0) ||
                 (playerData?.Loc == null))
@@ -173,13 +163,16 @@ namespace SotAMapper
                 validData = false;
             }
 
+            // build list of other "special" items we need to add to the map (player loc for example)
             IEnumerable<MapCoord> otherData = null;
             if (playerData != null)
                 otherData = new List<MapCoord> {playerData.Loc};
-            var conv = new MapCanvasConverter(map, MainCanvas, otherData);
-            if (!conv.Init())
-                validData = false;
 
+            // init coordinate converter
+            var conv = new MapCanvasConverter(map, MainCanvas, otherData);
+            var convReady = conv.Init();
+
+            // enable add button if we have valid data
             AddItemAtPlayersLocationButton.IsEnabled = validData;
 
             // color/brush used for rendering text and other annotations
@@ -231,95 +224,117 @@ namespace SotAMapper
             // otherwise render map data
             else
             {
-                // render all map items
-                foreach (var mapItem in map.Items)
+                // if coordinate converter was initialized successfully
+                if (convReady)
                 {
-                    conv.ConvertMapToCanvas(mapItem.Coord, out canvasX, out canvasY);
+                    // render all map items
+                    foreach (var mapItem in map.Items)
+                    {
+                        conv.ConvertMapToCanvas(mapItem.Coord, out canvasX, out canvasY);
 
-                    // if an icon exits for this item use that
-                    var iconPath = System.IO.Path.Combine(Globals.IconDir, mapItem.Name + ".png");
-                    if (File.Exists(iconPath))
+                        // if an icon exits for this item use that
+                        var iconPath = System.IO.Path.Combine(Globals.IconDir, mapItem.Name + ".png");
+                        if (File.Exists(iconPath))
+                        {
+                            var img = new Image();
+                            var bmpImg = new BitmapImage();
+                            bmpImg.BeginInit();
+                            bmpImg.UriSource = new Uri(iconPath);
+                            bmpImg.EndInit();
+                            img.Stretch = Stretch.Fill;
+                            img.Source = bmpImg;
+                            img.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                            img.Arrange(new Rect(img.DesiredSize));
+                            Canvas.SetLeft(img, canvasX - (img.ActualWidth/2.0));
+                            Canvas.SetTop(img, canvasY - (img.ActualHeight/2.0));
+                            MainCanvas.Children.Add(img);
+
+                            _uiElementToMapItemMap[img] = mapItem;
+                            img.MouseEnter += new MouseEventHandler(OnMouseEnter);
+                            img.MouseLeave += new MouseEventHandler(OnMouseLeave);
+                        }
+
+                        // otherwise, just use a text label
+                        else
+                        {
+                            var myEll = new Ellipse();
+                            myEll.Stroke = lineBrush;
+                            myEll.Fill = lineBrush;
+                            myEll.StrokeThickness = 2;
+                            myEll.Width = myEll.Height = 10.0;
+                            Canvas.SetLeft(myEll, canvasX - (myEll.Width/2.0));
+                            Canvas.SetTop(myEll, canvasY - (myEll.Height/2.0));
+                            MainCanvas.Children.Add(myEll);
+
+                            label = new TextBlock();
+                            label.Text = mapItem.Name;
+                            label.Foreground = lineBrush;
+                            label.FontSize = 18;
+                            label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                            label.Arrange(new Rect(label.DesiredSize));
+                            Canvas.SetLeft(label, canvasX - (label.ActualWidth/2.0));
+                            Canvas.SetTop(label, canvasY - (label.ActualHeight*1.2));
+                            MainCanvas.Children.Add(label);
+                        }
+                    }
+
+                    conv.ConvertMapToCanvas(playerData.Loc, out canvasX, out canvasY);
+
+                    // render player using player icon if one exists
+                    var playerIconPath = System.IO.Path.Combine(Globals.IconDir, "Player.png");
+                    UIElement playerOb = null;
+                    if (File.Exists(playerIconPath))
                     {
                         var img = new Image();
                         var bmpImg = new BitmapImage();
                         bmpImg.BeginInit();
-                        bmpImg.UriSource = new Uri(iconPath);
+                        bmpImg.UriSource = new Uri(playerIconPath);
                         bmpImg.EndInit();
                         img.Stretch = Stretch.Fill;
                         img.Source = bmpImg;
                         img.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                         img.Arrange(new Rect(img.DesiredSize));
-                        Canvas.SetLeft(img, canvasX - (img.ActualWidth / 2.0));
-                        Canvas.SetTop(img, canvasY - (img.ActualHeight / 2.0));
+                        Canvas.SetLeft(img, canvasX - (img.ActualWidth/2.0));
+                        Canvas.SetTop(img, canvasY - (img.ActualHeight/2.0));
                         MainCanvas.Children.Add(img);
-
-                        _uiElementToMapItemMap[img] = mapItem;
-                        img.MouseEnter += new MouseEventHandler(OnMouseEnter);
-                        img.MouseLeave += new MouseEventHandler(OnMouseLeave);
+                        playerOb = img;
                     }
-
-                    // otherwise, just use a text label
+                    // otherwise render player using text
                     else
                     {
-                        var myEll = new Ellipse();
-                        myEll.Stroke = lineBrush;
-                        myEll.Fill = lineBrush;
-                        myEll.StrokeThickness = 2;
-                        myEll.Width = myEll.Height = 10.0;
-                        Canvas.SetLeft(myEll, canvasX - (myEll.Width / 2.0));
-                        Canvas.SetTop(myEll, canvasY - (myEll.Height / 2.0));
-                        MainCanvas.Children.Add(myEll);
-
                         label = new TextBlock();
-                        label.Text = mapItem.Name;
+                        label.Text = "*";
                         label.Foreground = lineBrush;
-                        label.FontSize = 18;
+                        label.FontSize = 50;
                         label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                         label.Arrange(new Rect(label.DesiredSize));
-                        Canvas.SetLeft(label, canvasX - (label.ActualWidth / 2.0));
-                        Canvas.SetTop(label, canvasY - (label.ActualHeight * 1.2));
+                        Canvas.SetLeft(label, canvasX - (label.ActualWidth/2.0));
+                        Canvas.SetTop(label, canvasY - (label.ActualHeight/2.0));
                         MainCanvas.Children.Add(label);
+                        playerOb = label;
                     }
+                    _uiElementToMapItemMap[playerOb] = new MapItem("Player Position", playerData.Loc);
+                    playerOb.MouseEnter += new MouseEventHandler(OnMouseEnter);
+                    playerOb.MouseLeave += new MouseEventHandler(OnMouseLeave);
                 }
-
-                conv.ConvertMapToCanvas(playerData.Loc, out canvasX, out canvasY);
-
-                // render player using player icon if one exists
-                var playerIconPath = System.IO.Path.Combine(Globals.IconDir, "Player.png");
-                UIElement playerOb = null;
-                if (File.Exists(playerIconPath))
-                {
-                    var img = new Image();
-                    var bmpImg = new BitmapImage();
-                    bmpImg.BeginInit();
-                    bmpImg.UriSource = new Uri(playerIconPath);
-                    bmpImg.EndInit();
-                    img.Stretch = Stretch.Fill;
-                    img.Source = bmpImg;
-                    img.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
-                    img.Arrange(new Rect(img.DesiredSize));
-                    Canvas.SetLeft(img, canvasX - (img.ActualWidth / 2.0));
-                    Canvas.SetTop(img, canvasY - (img.ActualHeight / 2.0));
-                    MainCanvas.Children.Add(img);
-                    playerOb = img;
-                }
-                // otherwise render player using text
+                // we have valid data (map, player loc, etc.) but were not able to init coordinate
+                // converter - this indicates the map data file is empty
                 else
                 {
+                    var helpText =
+                        "\n\n\n" +
+                        "Map file is empty, please add some items using the Add button";
                     label = new TextBlock();
-                    label.Text = "*";
+                    label.Text = helpText;
                     label.Foreground = lineBrush;
-                    label.FontSize = 50;
+                    label.FontSize = 18;
+                    label.TextAlignment = TextAlignment.Center;
                     label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                     label.Arrange(new Rect(label.DesiredSize));
-                    Canvas.SetLeft(label, canvasX - (label.ActualWidth / 2.0));
-                    Canvas.SetTop(label, canvasY - (label.ActualHeight / 2.0));
+                    Canvas.SetLeft(label, (MainCanvas.ActualWidth / 2.0) - (label.ActualWidth / 2.0));
+                    Canvas.SetTop(label, conv.CanvasMarginY);
                     MainCanvas.Children.Add(label);
-                    playerOb = label;
                 }
-                _uiElementToMapItemMap[playerOb] = new MapItem("Player Position",playerData.Loc);
-                playerOb.MouseEnter += new MouseEventHandler(OnMouseEnter);
-                playerOb.MouseLeave += new MouseEventHandler(OnMouseLeave);
 
                 // render the compass image
                 var compassIconPath = System.IO.Path.Combine(Globals.IconDir, "CompassDirections.png");

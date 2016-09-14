@@ -82,9 +82,6 @@ namespace SotAMapper
             double mapWidth = (double)(maxZ - minZ);
             double mapHeight = (double)(maxX - minX);
 
-            if ((mapWidth == 0) || (mapHeight == 0))
-                return false;
-
             // determine render size
 
             var canvasWidth = _canvas.ActualWidth;
@@ -97,8 +94,8 @@ namespace SotAMapper
             // will preserve the aspect ratio and fit within the
             // avaiable space
 
-            var widthScale = renderWidth / mapWidth;
-            var heightScale = renderHeight / mapHeight;
+            var widthScale = (mapWidth != 0) ? (renderWidth / mapWidth) : 0;
+            var heightScale = (mapHeight != 0) ? (renderHeight / mapHeight) : 0;
             _mapToCanvasScale = Math.Min(widthScale, heightScale);
 
             // extreme corner of map data (north west corner) used
@@ -112,6 +109,14 @@ namespace SotAMapper
 
         public void ConvertMapToCanvas(MapCoord mapLoc, out double canvasX, out double canvasY)
         {
+            // special case, if map scale is zero, just map all coordinates to the center
+            if (_mapToCanvasScale == 0)
+            {
+                canvasX = _canvas.ActualWidth / 2.0;
+                canvasY = _canvas.ActualHeight / 2.0;
+                return;
+            }
+
             // scale map loc to canvas, reverse direction, and map Z=>X and X=>Y
 
             canvasX = -(mapLoc.Z - _mapUpperLeftZ) * _mapToCanvasScale;

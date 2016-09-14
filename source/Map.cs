@@ -26,7 +26,7 @@ namespace SotAMapper
         /// <summary>
         /// Set of items loaded from the map data file
         /// </summary>
-        public IEnumerable<MapItem> Items { get { return _items; } } 
+        public IEnumerable<MapItem> Items { get { return _items ?? new List<MapItem>(); } } 
 
         // extremes of the map data
 
@@ -35,17 +35,12 @@ namespace SotAMapper
 
         public override string ToString()
         {
-            if ((Name == null) || (Items == null) || (MinLoc == null) || (MaxLoc == null))
-            {
-                return "no data";
-            }
-
             var sb = new StringBuilder();
 
-            sb.Append("Name=" + Name + "\n");
+            sb.Append("Name=" + (Name ?? "null") + "\n");
 
-            sb.Append("   MinLoc: " + MinLoc + "\n");
-            sb.Append("   MaxLoc: " + MaxLoc + "\n");
+            sb.Append("   MinLoc: " + (MinLoc?.ToString() ?? "null") + "\n");
+            sb.Append("   MaxLoc: " + (MaxLoc?.ToString() ?? "null") + "\n");
 
             foreach (var mapItem in Items)
             {
@@ -111,15 +106,12 @@ namespace SotAMapper
             MinLoc = null;
             MaxLoc = null;
 
-            if (_items == null)
-                return;
-
             float?
                 minX = null, maxX = null,
                 minY = null, maxY = null,
                 minZ = null, maxZ = null;
 
-            foreach (var item in _items)
+            foreach (var item in Items)
             {
                 Utils.CheckAndSetMin(ref minX, item.Coord.X);
                 Utils.CheckAndSetMin(ref minY, item.Coord.Y);
@@ -147,6 +139,9 @@ namespace SotAMapper
                 {
                     sw.WriteLine(itm.Name + ", " + itm.Coord);
                 }
+
+                if (_items == null)
+                    _items = new List<MapItem>();
 
                 _items.Add(itm);
 
