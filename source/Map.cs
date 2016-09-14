@@ -72,11 +72,6 @@ namespace SotAMapper
 
                 var lines = File.ReadLines(mapFile);
 
-                float? 
-                    minX = null, maxX = null, 
-                    minY = null, maxY = null,
-                    minZ = null, maxZ = null;
-
                 foreach (var line in lines)
                 {
                     var toks = line.Split(',');
@@ -96,26 +91,12 @@ namespace SotAMapper
                     if (itemName?.Length == 0)
                         continue;
 
-                    Utils.CheckAndSetMin(ref minX, x);
-                    Utils.CheckAndSetMin(ref minY, y);
-                    Utils.CheckAndSetMin(ref minZ, z);
-
-                    Utils.CheckAndSetMax(ref maxX, x);
-                    Utils.CheckAndSetMax(ref maxY, y);
-                    Utils.CheckAndSetMax(ref maxZ, z);
-
                     var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
 
                     _items.Add(mapItem);
                 }
 
-                if ((minX != null) && (maxX != null) &&
-                    (minY != null) && (maxY != null) &&
-                    (minZ != null) && (maxZ != null))
-                {
-                    MinLoc = new MapCoord(minX.GetValueOrDefault(), minY.GetValueOrDefault(), minZ.GetValueOrDefault());
-                    MaxLoc = new MapCoord(maxX.GetValueOrDefault(), maxY.GetValueOrDefault(), maxZ.GetValueOrDefault());
-                }
+                ComputeMinMaxValues();
             }
             catch (Exception)
             {
@@ -123,6 +104,39 @@ namespace SotAMapper
             }
 
             return true;
+        }
+
+        private void ComputeMinMaxValues()
+        {
+            MinLoc = null;
+            MaxLoc = null;
+
+            if (_items == null)
+                return;
+
+            float?
+                minX = null, maxX = null,
+                minY = null, maxY = null,
+                minZ = null, maxZ = null;
+
+            foreach (var item in _items)
+            {
+                Utils.CheckAndSetMin(ref minX, item.Coord.X);
+                Utils.CheckAndSetMin(ref minY, item.Coord.Y);
+                Utils.CheckAndSetMin(ref minZ, item.Coord.Z);
+
+                Utils.CheckAndSetMax(ref maxX, item.Coord.X);
+                Utils.CheckAndSetMax(ref maxY, item.Coord.Y);
+                Utils.CheckAndSetMax(ref maxZ, item.Coord.Z);
+            }
+
+            if ((minX != null) && (maxX != null) &&
+                (minY != null) && (maxY != null) &&
+                (minZ != null) && (maxZ != null))
+            {
+                MinLoc = new MapCoord(minX.GetValueOrDefault(), minY.GetValueOrDefault(), minZ.GetValueOrDefault());
+                MaxLoc = new MapCoord(maxX.GetValueOrDefault(), maxY.GetValueOrDefault(), maxZ.GetValueOrDefault());
+            }
         }
 
         public void AddMapItem(MapItem itm)
@@ -135,6 +149,8 @@ namespace SotAMapper
                 }
 
                 _items.Add(itm);
+
+                ComputeMinMaxValues();
             }
             catch (Exception)
             {
