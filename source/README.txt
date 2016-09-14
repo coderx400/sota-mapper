@@ -80,8 +80,60 @@ If a .PNG file is present in the "data/icons" directory which matches the name
 of the item in the map data .csv file, then the image will be shown instead.
 
 ################################################################################
+# Contributors
+################################################################################
+
+Project Creator, Programmer
+
+    coder1024 (coder1024@gmail.com)
+
+Testing Feedback, Suggestions, Bug Reports
+
+    Umuri
+    Bushmaster
+    Bom
+    moko
+    Frostll
+    lollie
+    LiquidSky
+    Kabalyero
+    cartodude
+
+Map Data
+
+    LiquidSky
+    lollie
+                                        
+################################################################################
+# Known Issues
+################################################################################
+
+- when using the Add button added in v1.3, the map overall extents aren't
+  re-computed, giving some strange results when building a map as you go with
+  that feature
+- some maps seem to have reversed coordinate systems, Berek confirmed that this
+  is to be expected for some of the maps  
+
+################################################################################
+# Feature Requests
+################################################################################
+
+- ability to create a new map file using the name reported by SotA, saving the
+  need to manually create it with a matching filename
+- add a background image which could represent the local area better than
+  just the black background
+- zoom function
+- pre-canned Add functionality to save the need to type out common names for
+  resource types, etc.
+- edit item, change name
+- remove item for accidentally added items
+
+################################################################################
 # History
 ################################################################################
+
+NEXT VERSION
+- data updates
 
 2016.09.11, v1.3
 - added TopMost checkbox, checking it will attempt to keep the window on top
