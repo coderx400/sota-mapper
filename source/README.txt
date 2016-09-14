@@ -36,6 +36,9 @@ A separate .csv file is needed for each SotA map and should be in the
 "data/maps" directory having a name matching the SotA map name as reported in
 the /loc command.
 
+The map data .csv file must be plain text format, make sure you're text editor
+isn't saving it as RTF or some other format.
+
 For example, suppose the /loc command printed out the below.  In this case,
 there should be a file "data/maps/Novia_R1_City_Soltown.csv" which contains
 a list of items for that map.
