@@ -90,23 +90,23 @@ Project Creator, Programmer
 
     coder1024 (coder1024@gmail.com)
 
+Data Files (Maps, Icons, etc.)
+
+    LiquidSky
+    lollie
+
 Testing Feedback, Suggestions, Bug Reports
 
-    Umuri
-    Bushmaster
-    Bom
-    moko
-    Frostll
-    lollie
-    LiquidSky
-    Kabalyero
-    cartodude
     Berek
-
-Map Data
-
+    Bom
+    Bushmaster
+    cartodude
+    Frostll
+    Kabalyero
     LiquidSky
     lollie
+    moko
+    Umuri
                                         
 ################################################################################
 # Known Issues
