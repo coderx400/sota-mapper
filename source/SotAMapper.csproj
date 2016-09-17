@@ -66,6 +66,7 @@
     </ApplicationDefinition>
     <Compile Include="Globals.cs" />
     <Compile Include="IniFile.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="MapItemNamePrompt.xaml.cs">
       <DependentUpon>MapItemNamePrompt.xaml</DependentUpon>
     </Compile>

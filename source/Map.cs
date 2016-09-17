@@ -59,6 +59,8 @@ namespace SotAMapper
         {
             try
             {
+                Log.WriteLine($"LOAD: {mapFile}");
+
                 MapFilePath = mapFile;
                 Name = Path.GetFileNameWithoutExtension(mapFile);
                 _items = new List<MapItem>();
@@ -87,14 +89,18 @@ namespace SotAMapper
                         continue;
 
                     var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
+                    Log.WriteLine($"loaded map item: {mapItem}");
 
                     _items.Add(mapItem);
                 }
 
+                Log.WriteLine($"loaded {_items.Count} map items");
+
                 ComputeMinMaxValues();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.WriteLine($"EXCEPTION: {ex.Message}");
                 return false;
             }
 
@@ -128,6 +134,11 @@ namespace SotAMapper
             {
                 MinLoc = new MapCoord(minX.GetValueOrDefault(), minY.GetValueOrDefault(), minZ.GetValueOrDefault());
                 MaxLoc = new MapCoord(maxX.GetValueOrDefault(), maxY.GetValueOrDefault(), maxZ.GetValueOrDefault());
+                Log.WriteLine($"MinLoc={MinLoc}, MaxLoc={MaxLoc}");
+            }
+            else
+            {
+                Log.WriteLine("unable to determine min/max map loc for map");
             }
         }
 
@@ -135,6 +146,8 @@ namespace SotAMapper
         {
             try
             {
+                Log.WriteLine($"Add map item, {itm}");
+
                 using (var sw = File.AppendText(MapFilePath))
                 {
                     sw.WriteLine(itm.Name + ", " + itm.Coord);
@@ -147,8 +160,9 @@ namespace SotAMapper
 
                 ComputeMinMaxValues();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.WriteLine($"EXCEPTION: {ex.Message}");
             }
         }
     }

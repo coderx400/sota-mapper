@@ -31,21 +31,28 @@ namespace SotAMapper
         {
             try
             {
+                Log.WriteLine("loading map .csv files");
+
                 _loadedMaps = new Dictionary<string, Map>();
 
                 var mapFiles = Directory.GetFiles(Globals.MapDir, "*.csv");
-                foreach (var mapFile in mapFiles)
+                if (mapFiles != null)
                 {
-                    var map = new Map();
-                    if (!map.Load(mapFile))
-                        continue;
+                    Log.WriteLine($"found {mapFiles.Length} map .csv files");
 
-                    _loadedMaps[map.Name.ToUpper()] = map;
-                    Debug.WriteLine(map);
+                    foreach (var mapFile in mapFiles)
+                    {
+                        var map = new Map();
+                        if (!map.Load(mapFile))
+                            continue;
+
+                        _loadedMaps[map.Name.ToUpper()] = map;
+                    }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.WriteLine($"EXCEPTION: {ex.Message}");
             }
         }
     }

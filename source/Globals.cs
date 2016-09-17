@@ -26,6 +26,9 @@ namespace SotAMapper
         public static readonly string LogFilePattern = "SotAChatLog_*.txt";
         public static readonly string CPDFileName = "CurrentPlayerData.txt";
 
+        public static string AppLogFile { get; private set; }
+        public static readonly string AppLogFileName = "SotAMapper_log.txt";
+
         private static List<string> _sotaInstallDirs; 
         public static IEnumerable<string> SotAInstallDirs => _sotaInstallDirs;
 
@@ -40,12 +43,27 @@ namespace SotAMapper
             IconDir = System.IO.Path.Combine(DataDir, "icons");
             LogDir = Path.Combine(appDataDir, "Portalarium", "Shroud of the Avatar", "ChatLogs");
 
+            AppLogFile = Path.Combine(ExeDir, AppLogFileName);
+
             var settingsDir = System.IO.Path.Combine(appDataDir, AppDataDirName);
             Directory.CreateDirectory(settingsDir);
 
             SettingsFilePath = System.IO.Path.Combine(settingsDir, SettingsFileName);
 
             _sotaInstallDirs = FindSotAInstallDirs();
+
+            Log.WriteLine($"ExeDir={ExeDir}");
+            Log.WriteLine($"DataDir={DataDir}");
+            Log.WriteLine($"MapDir={MapDir}");
+            Log.WriteLine($"IconDir={IconDir}");
+            Log.WriteLine($"LogDir={LogDir}");
+            Log.WriteLine($"SettingsFilePath={SettingsFilePath}");
+            Log.WriteLine($"AppLogFile={AppLogFile}");
+
+            foreach (var instDir in SotAInstallDirs)
+            {
+                Log.WriteLine($"SotAInstallDir={instDir}");
+            }
         }
 
         private static List<string> FindSotAInstallDirs()

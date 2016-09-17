@@ -35,6 +35,20 @@ namespace SotAMapper
 
         public MainWindow()
         {
+            // enable logging if command line arg present
+            var args = Environment.GetCommandLineArgs();
+            if (args != null)
+            {
+                foreach (var arg in args)
+                {
+                    if (string.Compare(arg, "-enablelogging", true) == 0)
+                        Log.Enabled = true;
+                }                
+            }
+
+            var ver = Assembly.GetExecutingAssembly().GetName().Version;
+            Log.WriteLine("starting SotAMapper v" + ver.Major + "." + ver.Minor);
+
             InitializeComponent();
 
             StatusBarTextBlock.Text = "";
@@ -45,7 +59,6 @@ namespace SotAMapper
 
             // build window title, use embedded assembly version so it can be set
             // in one place.
-            var ver = Assembly.GetExecutingAssembly().GetName().Version;
             Title = "SotAMapper v" + ver.Major + "." + ver.Minor;
 
             // initial render
@@ -66,6 +79,7 @@ namespace SotAMapper
             var ini = new IniFile(Globals.SettingsFilePath);
 
             var topMostFlag = string.Compare(ini.Read("TopMost", "false"), "true", true) == 0;
+            Log.WriteLine("TopMost=" + topMostFlag);
             Topmost = topMostFlag;
             TopMostCheckbox.IsChecked = topMostFlag;
         }
