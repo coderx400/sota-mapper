@@ -141,6 +141,8 @@ NEXT VERSION
 - empty map file is now tolerated and handled correctly, this allows running
   the app with an empty map file and adding all items using the Add button and
   now (for real this time!) never having to manually enter any coordinates
+- added logging which is off by default but which can be turned on via command
+  line argument to help diagnose issues
 
 2016.09.11, v1.3
 - added TopMost checkbox, checking it will attempt to keep the window on top
