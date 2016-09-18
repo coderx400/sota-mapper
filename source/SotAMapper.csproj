@@ -132,7 +132,9 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /d /e /i /r /f /y "$(SolutionDir)data\*.*" "$(TargetDir)data"
 xcopy /d /r /f /y "$(SolutionDir)README.txt" "$(TargetDir)"
-xcopy /d /r /f /y "$(SolutionDir)screenshot.png" "$(TargetDir)"</PostBuildEvent>
+xcopy /d /r /f /y "$(SolutionDir)screenshot.png" "$(TargetDir)"
+if not exist "$(TargetDir)scripts" mkdir "$(TargetDir)scripts"
+copy /y "$(SolutionDir)scripts\run-with-logging.bat" "$(TargetDir)scripts"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

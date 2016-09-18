@@ -1,6 +1,8 @@
 @echo off
 
 rem ****************************************************************************
+rem * cleans, builds solution, then zips up the source into the output dir
+rem *
 rem * assumes VS bin directory (with devenv.exe) and 7-zip install directory
 rem * are both in the PATH and available
 rem ****************************************************************************
