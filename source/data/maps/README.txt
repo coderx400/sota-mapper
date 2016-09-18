@@ -14,3 +14,6 @@ LiquidSky
 lollie
    HiddenVale_Forest02_Road_Tier1
    OwlsHead
+
+moko
+   Novia_R10_Swamp02_01
