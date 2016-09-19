@@ -281,7 +281,7 @@ namespace SotAMapper
 
                             // copy to temp file
                             var tempFilePath = Path.GetTempFileName();
-                            File.Copy(latestModifiedCPDFile, tempFilePath);
+                            File.Copy(latestModifiedCPDFile, tempFilePath, true);
 
                             // load temp file
                             var cpdContent = File.ReadAllText(tempFilePath);
