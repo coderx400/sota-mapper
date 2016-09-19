@@ -123,7 +123,7 @@ namespace SotAMapper
                                     var mAC = areaChangeRE.Match(line);
                                     if (mAC?.Success ?? false)
                                     {
-                                        Log.WriteLine("found area change, " + line);
+                                        Log.WriteLine("found area change line, " + line);
 
                                         var dateTimeStr = mAC.Groups[1].Value;
                                         var newAreaName = mAC.Groups[2].Value;
@@ -132,6 +132,8 @@ namespace SotAMapper
                                         DateTime dateTime;
                                         if (DateTime.TryParse(dateTimeStr, out dateTime))
                                         {
+                                            Log.WriteLine("parsed area change line OK");
+
                                             // area change updates the area name and nulls out the map name
                                             // since we know map has changed, but don't know the new map name
 
@@ -164,13 +166,15 @@ namespace SotAMapper
                                                 }
                                             }
                                         }
+                                        else
+                                            Log.WriteLine("failed to parse area change line");
                                     }
 
                                     // if this is a /loc output line
                                     var m = locRE.Match(line);
                                     if (m?.Success ?? false)
                                     {
-                                        Log.WriteLine("found loc, " + line);
+                                        Log.WriteLine("found loc line, " + line);
 
                                         var dateTimeStr = m.Groups[1].Value;
                                         var areaName = m.Groups[2].Value;
@@ -181,10 +185,13 @@ namespace SotAMapper
 
                                         DateTime dateTime;
                                         float x, y, z;
-                                        if (DateTime.TryParse(dateTimeStr, out dateTime) &&
-                                            float.TryParse(xStr, out x) &&
-                                            float.TryParse(yStr, out y) &&
-                                            float.TryParse(zStr, out z))
+
+                                        var parsedDateTime = DateTime.TryParse(dateTimeStr, out dateTime);
+                                        var parsedX = float.TryParse(xStr, out x);
+                                        var parsedY = float.TryParse(yStr, out y);
+                                        var parsedZ = float.TryParse(zStr, out z);
+
+                                        if (parsedDateTime && parsedX && parsedY && parsedZ)
                                         {
                                             Log.WriteLine("parsed loc line OK");
 
@@ -233,6 +240,8 @@ namespace SotAMapper
                                             // any prior data
                                             break;
                                         }
+                                        else
+                                            Log.WriteLine($"failed to parse loc line, parsedDateTime={parsedDateTime}, parsedX={parsedX}, parsedY={parsedY}, parsedZ={parsedZ}");
                                     }
                                 }
                             }
@@ -321,6 +330,8 @@ namespace SotAMapper
                                         }
                                     }
                                 }
+                                else
+                                    Log.WriteLine("failed to parse CPD line");
                             }
 
                             // delete temp file
