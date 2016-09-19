@@ -68,6 +68,8 @@ namespace SotAMapper
 
             while (true)
             {
+                Log.WriteLine(">>> check player data - BEGIN");
+
                 try
                 {
                     bool playerDataChanged = false;
@@ -81,6 +83,8 @@ namespace SotAMapper
 
                     // find most recently modified log file
                     var logFiles = Directory.GetFiles(Globals.LogDir, Globals.LogFilePattern);
+                    var numLogFiles = logFiles?.Length ?? 0;
+                    Log.WriteLine($"found {numLogFiles} log files");
                     foreach (var logFile in logFiles)
                     {
                         var lastModTime = File.GetLastWriteTime(logFile);
@@ -102,6 +106,8 @@ namespace SotAMapper
                             lastLoadedLogFile = latestModifiedLogFile;
                             lastLoadedLogFileTime = latestModifiedLogFileTime;
 
+                            Log.WriteLine("loading log file, " + lastLoadedLogFile);
+
                             // copy to temp file
                             File.Copy(latestModifiedLogFile, logTmpFile, true);
 
@@ -118,6 +124,8 @@ namespace SotAMapper
                                     var mAC = areaChangeRE.Match(line);
                                     if (mAC?.Success ?? false)
                                     {
+                                        Log.WriteLine("found area change, " + line);
+
                                         var dateTimeStr = mAC.Groups[1].Value;
                                         var newAreaName = mAC.Groups[2].Value;
                                         var oldAreaName = mAC.Groups[3].Value;
@@ -141,7 +149,8 @@ namespace SotAMapper
                                                 if ((playerDataAreaNameTime == null) ||
                                                     (dateTime > playerDataAreaNameTime))
                                                 {
-                                                    playerData = new PlayerData(newAreaName, playerData.MapName, playerData.Loc);
+                                                    playerData = new PlayerData(newAreaName, playerData.MapName,
+                                                        playerData.Loc);
                                                     playerDataAreaNameTime = dateTime;
                                                     playerDataChanged = true;
                                                 }
@@ -149,7 +158,8 @@ namespace SotAMapper
                                                 if ((playerDataMapNameTime == null) ||
                                                     (dateTime > playerDataMapNameTime))
                                                 {
-                                                    playerData = new PlayerData(playerData.AreaName, null, playerData.Loc);
+                                                    playerData = new PlayerData(playerData.AreaName, null,
+                                                        playerData.Loc);
                                                     playerDataMapNameTime = dateTime;
                                                     playerDataChanged = true;
                                                 }
@@ -161,6 +171,8 @@ namespace SotAMapper
                                     var m = locRE.Match(line);
                                     if (m?.Success ?? false)
                                     {
+                                        Log.WriteLine("found loc, " + line);
+
                                         var dateTimeStr = m.Groups[1].Value;
                                         var areaName = m.Groups[2].Value;
                                         var mapName = m.Groups[3].Value;
@@ -175,6 +187,8 @@ namespace SotAMapper
                                             float.TryParse(yStr, out y) &&
                                             float.TryParse(zStr, out z))
                                         {
+                                            Log.WriteLine("parsed loc line OK");
+
                                             // /loc output line replaces all fields (name and cood)
 
                                             if (playerData == null)
@@ -190,7 +204,8 @@ namespace SotAMapper
                                                 if ((playerDataAreaNameTime == null) ||
                                                     (dateTime > playerDataAreaNameTime))
                                                 {
-                                                    playerData = new PlayerData(areaName, playerData.MapName, playerData.Loc);
+                                                    playerData = new PlayerData(areaName, playerData.MapName,
+                                                        playerData.Loc);
                                                     playerDataAreaNameTime = dateTime;
                                                     playerDataChanged = true;
                                                 }
@@ -198,7 +213,8 @@ namespace SotAMapper
                                                 if ((playerDataMapNameTime == null) ||
                                                     (dateTime > playerDataMapNameTime))
                                                 {
-                                                    playerData = new PlayerData(playerData.AreaName, mapName, playerData.Loc);
+                                                    playerData = new PlayerData(playerData.AreaName, mapName,
+                                                        playerData.Loc);
                                                     playerDataMapNameTime = dateTime;
                                                     playerDataChanged = true;
                                                 }
@@ -206,7 +222,8 @@ namespace SotAMapper
                                                 if ((playerDataLocTime == null) ||
                                                     (dateTime > playerDataLocTime))
                                                 {
-                                                    playerData = new PlayerData(playerData.AreaName, playerData.MapName, new MapCoord(x,y,z));
+                                                    playerData = new PlayerData(playerData.AreaName, playerData.MapName,
+                                                        new MapCoord(x, y, z));
                                                     playerDataLocTime = dateTime;
                                                     playerDataChanged = true;
                                                 }
@@ -224,7 +241,11 @@ namespace SotAMapper
                             // delete temp file
                             File.Delete(logTmpFile);
                         }
+                        else
+                            Log.WriteLine("no changes to log file since last check");
                     }
+                    else
+                        Log.WriteLine("no log files to consider");
 
                     //
                     // check CurrentPlayerData file in SotA install dir
@@ -259,6 +280,8 @@ namespace SotAMapper
                             lastLoadedCPDFile = latestModifiedCPDFile;
                             lastLoadedCPDFileTime = latestModifiedCPDFileTime;
 
+                            Log.WriteLine("loading CPD file, " + lastLoadedCPDFile);
+
                             File.Copy(latestModifiedCPDFile, cpdTempFile);
 
                             var cpdContent = File.ReadAllText(cpdTempFile);
@@ -275,6 +298,8 @@ namespace SotAMapper
                                     float.TryParse(yStr, out y) &&
                                     float.TryParse(zStr, out z))
                                 {
+                                    Log.WriteLine("parsed CPD file OK");
+
                                     // current player data file updates only location
 
                                     if (playerData == null)
@@ -298,9 +323,14 @@ namespace SotAMapper
                                 }
                             }
 
+                            // delete temp file
                             File.Delete(cpdTempFile);
                         }
+                        else
+                            Log.WriteLine("no changes to CPD file since last check");
                     }
+                    else
+                        Log.WriteLine("no CPD file to consider");
 
                     // if player data has changed, notify
                     if (playerDataChanged && (playerData != null))
@@ -314,9 +344,12 @@ namespace SotAMapper
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Log.WriteLine("EXCEPTION: " + ex.Message);
                 }
+
+                Log.WriteLine("<<< check player data - END");
 
                 // wait a bit before trying again
                 Thread.Sleep(_checkLogIntervalMS);

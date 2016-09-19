@@ -23,7 +23,7 @@ namespace SotAMapper
         public static readonly string AppDataDirName = "SotAMapper";
         public static readonly string SettingsFileName = "settings.ini";
         public static readonly string TempFileName = "_SotAMapper.tmp";
-        public static readonly string LogFilePattern = "SotAChatLog_*.txt";
+        public static readonly string LogFilePattern = "*.txt";
         public static readonly string CPDFileName = "CurrentPlayerData.txt";
 
         public static string AppLogFile { get; private set; }
