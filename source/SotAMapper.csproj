@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AutoInitCleanup.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="IniFile.cs" />
     <Compile Include="Log.cs" />

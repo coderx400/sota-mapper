@@ -28,7 +28,6 @@ namespace SotAMapper
         private MapDataMgr _mapDataMgr;
         private PlayerDataWatcher _playerDataWatcher;
 
-        private Map _lastMap;
         private PlayerData _lastPlayerData;
 
         private Dictionary<object, MapItem> _uiElementToMapItemMap; 
@@ -47,7 +46,7 @@ namespace SotAMapper
             }
 
             var ver = Assembly.GetExecutingAssembly().GetName().Version;
-            Log.WriteLine("starting SotAMapper v" + ver.Major + "." + ver.Minor);
+            Log.WriteLine(">>> starting SotAMapper v" + ver.Major + "." + ver.Minor);
 
             InitializeComponent();
 
@@ -62,7 +61,7 @@ namespace SotAMapper
             Title = "SotAMapper v" + ver.Major + "." + ver.Minor;
 
             // initial render
-            RenderMap(null, null);
+            RenderMap(null);
 
             // load up all available map files
             _mapDataMgr = new MapDataMgr();
@@ -98,16 +97,11 @@ namespace SotAMapper
         {
             //Debug.WriteLine(">>> player data changed: " + newPlayerData);
 
-            // ensure current map matches current player data (may be null if there is no map
-            // data for current player location)
-            var currentMap = _mapDataMgr.GetMap(newPlayerData.MapName);
-
             // store for later use by size changed event handler
-            _lastMap = currentMap;
             _lastPlayerData = newPlayerData;
 
             // trigger re-render on UI thread
-            Dispatcher.BeginInvoke((Action)(() => RenderMap(currentMap, newPlayerData)));
+            Dispatcher.BeginInvoke((Action)(() => RenderMap(newPlayerData)));
         }
 
         /// <summary>
@@ -116,13 +110,26 @@ namespace SotAMapper
         /// </summary>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            RenderMap(_lastMap, _lastPlayerData);
+            RenderMap(_lastPlayerData);
+        }
+
+        /// <summary>
+        /// Wraps intenal method for logging
+        /// </summary>
+        private void RenderMap(PlayerData playerData)
+        {
+            using (new AutoInitCleanup(
+                () => Log.WriteLine(">>> RenderMap BEGIN"),
+                () => Log.WriteLine("<<< RenderMap END")))
+            {
+                InternalRenderMap(playerData);
+            }
         }
 
         /// <summary>
         /// Render map data on WPF canvas
         /// </summary>
-        private void RenderMap(Map map, PlayerData playerData)
+        private void InternalRenderMap(PlayerData playerData)
         {
             _uiElementToMapItemMap = new Dictionary<object, MapItem>();
             double canvasX = 0, canvasY = 0;
@@ -140,38 +147,52 @@ namespace SotAMapper
             // do we have valid data to render?
             bool validData = true;
 
+            // map will be looked up later based on player data
+            Map currentMap = null;
+
+            // no player data?
             if (playerData == null)
             {
                 errors.Add("no player data, try using /loc");
+                Log.WriteLine("playerData == null");
                 validData = false;
             }
+            // we have player data
             else
             {
+                Log.WriteLine("PlayerData: " + playerData.ToString());
+
+                // check map name
                 if ((playerData.MapName?.Length ?? 0) == 0)
                 {
-                    errors.Add("unable to determine player map, try using /loc");
+                    errors.Add("no player map name, try using /loc");
+                    Log.WriteLine("no map name");
                     validData = false;
                 }
+                else
+                {
+                    // lookup map by name
+                    currentMap = _mapDataMgr.GetMap(playerData.MapName);
+                    if (currentMap == null)
+                    {
+                        errors.Add("no .csv file for current map, compare /loc output to data/maps files");
+                        Log.WriteLine("no data available for player's current map");
+                        validData = false;
+                    }
+                }
 
+                // check loc
                 if (playerData.Loc == null)
                 {
-                    errors.Add("unable to determine player position, try using /loc");
+                    errors.Add("no player position, try using /loc");
+                    Log.WriteLine("no player loc");
                     validData = false;
                 }
             }
 
-            if (map == null)
-            {
-                if ((playerData?.MapName?.Length ?? 0) > 0)
-                {
-                    errors.Add("no .csv file for current map, compare /loc output to data/maps files");
-                    validData = false;
-                }
-            }
-
-            if ((map == null) ||
-                (playerData == null) ||
-                ((playerData?.MapName?.Length ?? 0) == 0) ||
+            // check for needed data, and clear valid flag if appropriate
+            if ((playerData == null) || 
+                (currentMap == null) ||                
                 (playerData?.Loc == null))
             {
                 validData = false;
@@ -183,7 +204,7 @@ namespace SotAMapper
                 otherData = new List<MapCoord> {playerData.Loc};
 
             // init coordinate converter
-            var conv = new MapCanvasConverter(map, MainCanvas, otherData);
+            var conv = new MapCanvasConverter(currentMap, MainCanvas, otherData);
             var convReady = conv.Init();
 
             // enable add button if we have valid data
@@ -242,7 +263,7 @@ namespace SotAMapper
                 if (convReady)
                 {
                     // render all map items
-                    foreach (var mapItem in map.Items)
+                    foreach (var mapItem in currentMap.Items)
                     {
                         conv.ConvertMapToCanvas(mapItem.Coord, out canvasX, out canvasY);
 
@@ -370,7 +391,7 @@ namespace SotAMapper
 
                 // show map name on top
                 label = new TextBlock();
-                label.Text = map.Name;
+                label.Text = currentMap.Name;
                 label.Foreground = lineBrush;
                 label.FontSize = 18;
                 label.TextAlignment = TextAlignment.Center;
@@ -432,8 +453,15 @@ namespace SotAMapper
 
         private void AddItemAtPlayerLocation_Click(object sender, RoutedEventArgs e)
         {
-            if ((_lastMap == null) || (_lastPlayerData == null) ||
-                (_lastPlayerData.MapName == null) || (_lastPlayerData.Loc == null))
+            if ((_lastPlayerData == null) || 
+                ((_lastPlayerData?.MapName?.Length ?? 0) == 0) || 
+                (_lastPlayerData.Loc == null))
+            {
+                return;
+            }
+
+            var currentMap = _mapDataMgr.GetMap(_lastPlayerData.MapName);
+            if (currentMap == null)
             {
                 return;
             }
@@ -441,7 +469,7 @@ namespace SotAMapper
             var dlg = new MapItemNamePrompt();
             dlg.Owner = this;
 
-            dlg.MapNameLabel.Content = _lastMap.Name;
+            dlg.MapNameLabel.Content = currentMap.Name;
             dlg.LocLabel.Content = _lastPlayerData.Loc.ToString();
 
             var res = dlg.ShowDialog();
@@ -457,9 +485,9 @@ namespace SotAMapper
 
             var itm = new MapItem(mapItemName, _lastPlayerData.Loc);
 
-            _lastMap.AddMapItem(itm);
+            currentMap.AddMapItem(itm);
 
-            RenderMap(_lastMap, _lastPlayerData);
+            RenderMap(_lastPlayerData);
         }
     }
 }

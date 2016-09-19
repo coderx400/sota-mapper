@@ -69,6 +69,8 @@ namespace SotAMapper
 
                 var lines = File.ReadLines(mapFile);
 
+                const int maxNumItemsToLog = 3;
+
                 foreach (var line in lines)
                 {
                     var toks = line.Split(',');
@@ -89,9 +91,17 @@ namespace SotAMapper
                         continue;
 
                     var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
-                    Log.WriteLine($"loaded map item: {mapItem}");
-
                     _items.Add(mapItem);
+
+                    if (_items.Count <= maxNumItemsToLog)
+                    {
+                        Log.WriteLine($"loaded map item: {mapItem}");
+                    }
+
+                    if (_items.Count == (maxNumItemsToLog + 1))
+                    {
+                        Log.WriteLine("... remaining items not logged");
+                    }
                 }
 
                 Log.WriteLine($"loaded {_items.Count} map items");
