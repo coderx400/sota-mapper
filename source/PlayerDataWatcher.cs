@@ -40,6 +40,43 @@ namespace SotAMapper
             t.Start();
         }
 
+        // regex used for parsing date/time strings from SotA chat logs
+        private Regex _dateTimeRE = new Regex(@"(\d+)/(\d+)/(\d+) +(\d+):(\d+):(\d+) +(AM|PM)");
+
+        /// <summary>
+        /// parse date time from the string used in the SotA chat logs.
+        /// Can't use the default system parsing as its sensitive to region.
+        /// </summary>
+        private bool ParseDateTimeFromString(string str, out DateTime outDT)
+        {
+            bool result = false;
+            outDT = default(DateTime);
+
+            var m = _dateTimeRE.Match(str);
+            if (m?.Success ?? false)
+            {
+                int day, month, year, hour, min, sec;
+                string ampm;
+
+                if (int.TryParse(m.Groups[1].Value, out month) &&
+                    int.TryParse(m.Groups[2].Value, out day) &&
+                    int.TryParse(m.Groups[3].Value, out year) &&
+                    int.TryParse(m.Groups[4].Value, out hour) &&
+                    int.TryParse(m.Groups[5].Value, out min) &&
+                    int.TryParse(m.Groups[6].Value, out sec))
+                {
+                    ampm = m.Groups[7].Value;
+                    if (ampm == "PM")
+                        hour += 12;
+
+                    outDT = new DateTime(year, month, day, hour, min, sec);
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
         private void Worker()
         {
             // regex used to match /loc output lines in the log file
@@ -130,7 +167,7 @@ namespace SotAMapper
                                         var oldAreaName = mAC.Groups[3].Value;
 
                                         DateTime dateTime;
-                                        if (DateTime.TryParse(dateTimeStr, out dateTime))
+                                        if (ParseDateTimeFromString(dateTimeStr, out dateTime))
                                         {
                                             Log.WriteLine("parsed area change line OK");
 
@@ -186,7 +223,7 @@ namespace SotAMapper
                                         DateTime dateTime;
                                         float x, y, z;
 
-                                        var parsedDateTime = DateTime.TryParse(dateTimeStr, out dateTime);
+                                        var parsedDateTime = ParseDateTimeFromString(dateTimeStr, out dateTime);
                                         var parsedX = float.TryParse(xStr, out x);
                                         var parsedY = float.TryParse(yStr, out y);
                                         var parsedZ = float.TryParse(zStr, out z);
