@@ -134,7 +134,7 @@ Testing Feedback, Suggestions, Bug Reports
 # History
 ################################################################################
 
-NEXT VERSION
+2016.09.19, v1.4
 - data updates
 - when using the Add button to add a new map item, the min/max extents of the
   data are re-computed so the rendering doesn't get wonky as you add items when
