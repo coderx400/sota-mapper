@@ -33,35 +33,42 @@ namespace SotAMapper
 
         static Globals()
         {
-            var exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
-            var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            ExeDir = System.IO.Path.GetDirectoryName(exePath);
-            DataDir = System.IO.Path.Combine(ExeDir, "data");
-            MapDir = System.IO.Path.Combine(DataDir, "maps");
-            IconDir = System.IO.Path.Combine(DataDir, "icons");
-            LogDir = Path.Combine(appDataDir, "Portalarium", "Shroud of the Avatar", "ChatLogs");
-
-            AppLogFile = Path.Combine(ExeDir, AppLogFileName);
-
-            var settingsDir = System.IO.Path.Combine(appDataDir, AppDataDirName);
-            Directory.CreateDirectory(settingsDir);
-
-            SettingsFilePath = System.IO.Path.Combine(settingsDir, SettingsFileName);
-
-            _sotaInstallDirs = FindSotAInstallDirs();
-
-            Log.WriteLine($"ExeDir={ExeDir}");
-            Log.WriteLine($"DataDir={DataDir}");
-            Log.WriteLine($"MapDir={MapDir}");
-            Log.WriteLine($"IconDir={IconDir}");
-            Log.WriteLine($"LogDir={LogDir}");
-            Log.WriteLine($"SettingsFilePath={SettingsFilePath}");
-            Log.WriteLine($"AppLogFile={AppLogFile}");
-
-            foreach (var instDir in SotAInstallDirs)
+            try
             {
-                Log.WriteLine($"SotAInstallDir={instDir}");
+                var exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
+                var appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+                ExeDir = System.IO.Path.GetDirectoryName(exePath);
+                DataDir = System.IO.Path.Combine(ExeDir, "data");
+                MapDir = System.IO.Path.Combine(DataDir, "maps");
+                IconDir = System.IO.Path.Combine(DataDir, "icons");
+                LogDir = Path.Combine(appDataDir, "Portalarium", "Shroud of the Avatar", "ChatLogs");
+
+                AppLogFile = Path.Combine(ExeDir, AppLogFileName);
+
+                var settingsDir = System.IO.Path.Combine(appDataDir, AppDataDirName);
+                Directory.CreateDirectory(settingsDir);
+
+                SettingsFilePath = System.IO.Path.Combine(settingsDir, SettingsFileName);
+
+                _sotaInstallDirs = FindSotAInstallDirs();
+
+                Log.WriteLine($"ExeDir={ExeDir}");
+                Log.WriteLine($"DataDir={DataDir}");
+                Log.WriteLine($"MapDir={MapDir}");
+                Log.WriteLine($"IconDir={IconDir}");
+                Log.WriteLine($"LogDir={LogDir}");
+                Log.WriteLine($"SettingsFilePath={SettingsFilePath}");
+                Log.WriteLine($"AppLogFile={AppLogFile}");
+
+                foreach (var instDir in SotAInstallDirs)
+                {
+                    Log.WriteLine($"SotAInstallDir={instDir}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine("EXCEPTION: " + ex.Message);                
             }
         }
 

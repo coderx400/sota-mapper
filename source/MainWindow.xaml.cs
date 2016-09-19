@@ -30,51 +30,60 @@ namespace SotAMapper
 
         private PlayerData _lastPlayerData;
 
-        private Dictionary<object, MapItem> _uiElementToMapItemMap; 
+        private Dictionary<object, MapItem> _uiElementToMapItemMap;
 
         public MainWindow()
         {
-            // enable logging if command line arg present
-            var args = Environment.GetCommandLineArgs();
-            if (args != null)
+            try
             {
-                foreach (var arg in args)
+                // enable logging if command line arg present
+                var args = Environment.GetCommandLineArgs();
+                if (args != null)
                 {
-                    if (string.Compare(arg, "-enablelogging", true) == 0)
-                        Log.Enabled = true;
-                }                
+                    foreach (var arg in args)
+                    {
+                        if (string.Compare(arg, "-enablelogging", true) == 0)
+                            Log.Enabled = true;
+                    }
+                }
+
+                var ver = Assembly.GetExecutingAssembly().GetName().Version;
+                Log.WriteLine(">>> starting SotAMapper v" + ver.Major + "." + ver.Minor);
+
+                InitializeComponent();
+
+                StatusBarTextBlock.Text = "";
+
+                // app settings
+                LoadSettings();
+                SaveSettings();
+
+                // build window title, use embedded assembly version so it can be set
+                // in one place.
+                Title = "SotAMapper v" + ver.Major + "." + ver.Minor;
+
+                // initial render
+                RenderMap(null);
+
+                // load up all available map files
+                _mapDataMgr = new MapDataMgr();
+                _mapDataMgr.Load();
+
+                // start watching SotA log file for player /loc data
+                _playerDataWatcher = new PlayerDataWatcher();
+                _playerDataWatcher.PlayerDataChanged += OnPlayerDataChanged;
+                _playerDataWatcher.Start();
             }
-
-            var ver = Assembly.GetExecutingAssembly().GetName().Version;
-            Log.WriteLine(">>> starting SotAMapper v" + ver.Major + "." + ver.Minor);
-
-            InitializeComponent();
-
-            StatusBarTextBlock.Text = "";
-
-            // app settings
-            LoadSettings();
-            SaveSettings();
-
-            // build window title, use embedded assembly version so it can be set
-            // in one place.
-            Title = "SotAMapper v" + ver.Major + "." + ver.Minor;
-
-            // initial render
-            RenderMap(null);
-
-            // load up all available map files
-            _mapDataMgr = new MapDataMgr();
-            _mapDataMgr.Load();
-
-            // start watching SotA log file for player /loc data
-            _playerDataWatcher = new PlayerDataWatcher();
-            _playerDataWatcher.PlayerDataChanged += OnPlayerDataChanged;
-            _playerDataWatcher.Start();
+            catch (Exception ex)
+            {
+                Log.WriteLine("EXCEPTION: " + ex.Message);
+            }
         }
 
         private void LoadSettings()
         {
+            Log.WriteLine("LoadSettings");
+
             var ini = new IniFile(Globals.SettingsFilePath);
 
             var topMostFlag = string.Compare(ini.Read("TopMost", "false"), "true", true) == 0;
@@ -85,6 +94,8 @@ namespace SotAMapper
 
         private void SaveSettings()
         {
+            Log.WriteLine("SaveSettings");
+
             var ini = new IniFile(Globals.SettingsFilePath);
 
             ini.Write("TopMost", Topmost ? "true" : "false");
@@ -95,13 +106,15 @@ namespace SotAMapper
         /// </summary>
         public void OnPlayerDataChanged(PlayerData newPlayerData)
         {
+            Log.WriteLine("OnPlayerDataChanged");
+
             //Debug.WriteLine(">>> player data changed: " + newPlayerData);
 
             // store for later use by size changed event handler
             _lastPlayerData = newPlayerData;
 
             // trigger re-render on UI thread
-            Dispatcher.BeginInvoke((Action)(() => RenderMap(newPlayerData)));
+            Dispatcher.Invoke((Action) (() => RenderMap(newPlayerData)));
         }
 
         /// <summary>
@@ -110,19 +123,28 @@ namespace SotAMapper
         /// </summary>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            Log.WriteLine("Windows_SizeChanged");
+
             RenderMap(_lastPlayerData);
         }
 
         /// <summary>
-        /// Wraps intenal method for logging
+        /// Wraps intenal method for logging and trapping exception
         /// </summary>
         private void RenderMap(PlayerData playerData)
         {
-            using (new AutoInitCleanup(
-                () => Log.WriteLine(">>> RenderMap BEGIN"),
-                () => Log.WriteLine("<<< RenderMap END")))
+            try
             {
-                InternalRenderMap(playerData);
+                using (new AutoInitCleanup(
+                    () => Log.WriteLine(">>> RenderMap BEGIN"),
+                    () => Log.WriteLine("<<< RenderMap END")))
+                {
+                    InternalRenderMap(playerData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine("EXCEPTION: " + ex.Message);
             }
         }
 
@@ -179,6 +201,8 @@ namespace SotAMapper
                         Log.WriteLine("no data available for player's current map");
                         validData = false;
                     }
+                    else
+                        Log.WriteLine("got loaded .csv map for player's current map name");
                 }
 
                 // check loc
@@ -188,11 +212,13 @@ namespace SotAMapper
                     Log.WriteLine("no player loc");
                     validData = false;
                 }
+                else
+                    Log.WriteLine("got valid player position");
             }
 
             // check for needed data, and clear valid flag if appropriate
-            if ((playerData == null) || 
-                (currentMap == null) ||                
+            if ((playerData == null) ||
+                (currentMap == null) ||
                 (playerData?.Loc == null))
             {
                 validData = false;
@@ -228,7 +254,7 @@ namespace SotAMapper
                     "Area: Soltown (Novia_R1_City_Soltown) Loc: (-15.7, 28.0, 23,2)\n" +
                     "there should be a file, \"data/maps/Novia_R1_City_Soltown.csv\" with map data\n\n" +
                     "Player location on map will update automatically, however it is necessary to\n" +
-                    "manually use the /loc command once each time when entering a map to sync current map.\n\n" +                    
+                    "manually use the /loc command once each time when entering a map to sync current map.\n\n" +
                     "Map items are rendered as text labels unless a PNG file exists in \"data/icons\" which\n" +
                     "matches the name of the item in the map .csv file\n\n" +
                     "The /loctrack command shows location on screen and makes it easier to build map files";
@@ -236,10 +262,10 @@ namespace SotAMapper
                 label.Text = helpText;
                 label.Foreground = lineBrush;
                 label.FontSize = 18;
-                label.TextAlignment = TextAlignment.Center;             
+                label.TextAlignment = TextAlignment.Center;
                 label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                 label.Arrange(new Rect(label.DesiredSize));
-                Canvas.SetLeft(label, (MainCanvas.ActualWidth / 2.0) - (label.ActualWidth / 2.0));
+                Canvas.SetLeft(label, (MainCanvas.ActualWidth/2.0) - (label.ActualWidth/2.0));
                 Canvas.SetTop(label, conv.CanvasMarginY);
                 MainCanvas.Children.Add(label);
 
@@ -251,7 +277,7 @@ namespace SotAMapper
                 label.TextAlignment = TextAlignment.Center;
                 label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                 label.Arrange(new Rect(label.DesiredSize));
-                Canvas.SetLeft(label, (MainCanvas.ActualWidth / 2.0) - (label.ActualWidth / 2.0));
+                Canvas.SetLeft(label, (MainCanvas.ActualWidth/2.0) - (label.ActualWidth/2.0));
                 Canvas.SetTop(label, MainCanvas.ActualHeight - conv.CanvasMarginY - label.ActualHeight);
                 MainCanvas.Children.Add(label);
             }
@@ -366,7 +392,7 @@ namespace SotAMapper
                     label.TextAlignment = TextAlignment.Center;
                     label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
                     label.Arrange(new Rect(label.DesiredSize));
-                    Canvas.SetLeft(label, (MainCanvas.ActualWidth / 2.0) - (label.ActualWidth / 2.0));
+                    Canvas.SetLeft(label, (MainCanvas.ActualWidth/2.0) - (label.ActualWidth/2.0));
                     Canvas.SetTop(label, conv.CanvasMarginY);
                     MainCanvas.Children.Add(label);
                 }
@@ -403,7 +429,7 @@ namespace SotAMapper
             }
 
             // show current time to indicate when map was last rendered
-            var now = DateTime.Now;            
+            var now = DateTime.Now;
             label = new TextBlock();
             label.Text = "Map Rendered: " + now.ToString();
             label.Foreground = lineBrush;
@@ -421,73 +447,95 @@ namespace SotAMapper
             MapItem mapItem = null;
             if (!(_uiElementToMapItemMap?.TryGetValue(sender, out mapItem) ?? false))
                 return;
-            if (mapItem == null)
+            if (mapItem?.Name == null)
                 return;
             StatusBarTextBlock.Text = mapItem.Name;
         }
 
         public void OnMouseLeave(object sender, RoutedEventArgs e)
         {
-            MapItem mapItem = null;
-            if (!(_uiElementToMapItemMap?.TryGetValue(sender, out mapItem) ?? false))
-                return;
-            if (mapItem == null)
-                return;
             StatusBarTextBlock.Text = "";
         }
 
         public void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
-            e.Handled = true;
+            try
+            {
+                Log.WriteLine("click link, " + e.Uri.AbsoluteUri);
+
+                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+                e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine("EXCEPTION: " + ex.Message);
+            }
         }
 
         private void TopMostCheckbox_Click(object sender, RoutedEventArgs e)
         {
-            if (sender == TopMostCheckbox)
+            try
             {
-                this.Topmost = TopMostCheckbox.IsChecked.GetValueOrDefault(false);
-                SaveSettings();
+                Log.WriteLine("toggle topmost checkbox");
+
+                if (sender == TopMostCheckbox)
+                {
+                    this.Topmost = TopMostCheckbox.IsChecked.GetValueOrDefault(false);
+                    SaveSettings();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine("EXCEPTION: " + ex.Message);
             }
         }
 
         private void AddItemAtPlayerLocation_Click(object sender, RoutedEventArgs e)
         {
-            if ((_lastPlayerData == null) || 
-                ((_lastPlayerData?.MapName?.Length ?? 0) == 0) || 
-                (_lastPlayerData.Loc == null))
+            try
             {
-                return;
-            }
+                Log.WriteLine("clicked Add button");
 
-            var currentMap = _mapDataMgr.GetMap(_lastPlayerData.MapName);
-            if (currentMap == null)
+                if ((_lastPlayerData == null) ||
+                    ((_lastPlayerData?.MapName?.Length ?? 0) == 0) ||
+                    (_lastPlayerData.Loc == null))
+                {
+                    return;
+                }
+
+                var currentMap = _mapDataMgr.GetMap(_lastPlayerData.MapName);
+                if (currentMap == null)
+                {
+                    return;
+                }
+
+                var dlg = new MapItemNamePrompt();
+                dlg.Owner = this;
+
+                dlg.MapNameLabel.Content = currentMap.Name;
+                dlg.LocLabel.Content = _lastPlayerData.Loc.ToString();
+
+                var res = dlg.ShowDialog();
+                if (!res.GetValueOrDefault())
+                    return;
+                var mapItemName = (dlg.ItemNameTextBox.Text ?? "").Trim();
+
+                if (mapItemName?.Length == 0)
+                {
+                    MessageBox.Show("No name provided!  Please enter a name for the map item.");
+                    return;
+                }
+
+                var itm = new MapItem(mapItemName, _lastPlayerData.Loc);
+
+                currentMap.AddMapItem(itm);
+
+                RenderMap(_lastPlayerData);
+            }
+            catch (Exception ex)
             {
-                return;
+                Log.WriteLine("EXCEPTION: " + ex.Message);
             }
-
-            var dlg = new MapItemNamePrompt();
-            dlg.Owner = this;
-
-            dlg.MapNameLabel.Content = currentMap.Name;
-            dlg.LocLabel.Content = _lastPlayerData.Loc.ToString();
-
-            var res = dlg.ShowDialog();
-            if (!res.GetValueOrDefault())
-                return;
-            var mapItemName = (dlg.ItemNameTextBox.Text ?? "").Trim();
-
-            if (mapItemName?.Length == 0)
-            {
-                MessageBox.Show("No name provided!  Please enter a name for the map item.");
-                return;
-            }
-
-            var itm = new MapItem(mapItemName, _lastPlayerData.Loc);
-
-            currentMap.AddMapItem(itm);
-
-            RenderMap(_lastPlayerData);
         }
     }
 }
