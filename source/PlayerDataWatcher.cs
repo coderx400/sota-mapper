@@ -42,8 +42,6 @@ namespace SotAMapper
 
         private void Worker()
         {
-            var logTmpFile = Path.Combine(Globals.LogDir, Globals.TempFileName);
-
             // regex used to match /loc output lines in the log file
             var locRE = new Regex(@"^\[(.+)\] +Area: +(.+) +\((.+)\) +Loc: +\((.+), *(.+), *(.+)\)");
 
@@ -109,10 +107,11 @@ namespace SotAMapper
                             Log.WriteLine("loading log file, " + lastLoadedLogFile);
 
                             // copy to temp file
-                            File.Copy(latestModifiedLogFile, logTmpFile, true);
+                            var tempFilePath = Path.GetTempFileName();
+                            File.Copy(latestModifiedLogFile, tempFilePath, true);
 
                             // load temp file
-                            var lines = File.ReadAllLines(logTmpFile);
+                            var lines = File.ReadAllLines(tempFilePath);
                             if (lines?.Length > 0)
                             {
                                 // read backwards through lines in log
@@ -239,7 +238,7 @@ namespace SotAMapper
                             }
 
                             // delete temp file
-                            File.Delete(logTmpFile);
+                            File.Delete(tempFilePath);
                         }
                         else
                             Log.WriteLine("no changes to log file since last check");
@@ -253,7 +252,6 @@ namespace SotAMapper
 
                     string latestModifiedCPDFile = null;
                     DateTime latestModifiedCPDFileTime = default(DateTime);
-                    string cpdTempFile = null;
 
                     foreach (var instDir in Globals.SotAInstallDirs)
                     {
@@ -267,7 +265,6 @@ namespace SotAMapper
                             {
                                 latestModifiedCPDFile = cpdFile;
                                 latestModifiedCPDFileTime = lastModTime;
-                                cpdTempFile = Path.Combine(instDir, Globals.TempFileName);
                             }
                         }
                     }
@@ -282,9 +279,12 @@ namespace SotAMapper
 
                             Log.WriteLine("loading CPD file, " + lastLoadedCPDFile);
 
-                            File.Copy(latestModifiedCPDFile, cpdTempFile);
+                            // copy to temp file
+                            var tempFilePath = Path.GetTempFileName();
+                            File.Copy(latestModifiedCPDFile, tempFilePath);
 
-                            var cpdContent = File.ReadAllText(cpdTempFile);
+                            // load temp file
+                            var cpdContent = File.ReadAllText(tempFilePath);
 
                             var m = cpdRE.Match(cpdContent);
                             if (m?.Success ?? false)
@@ -324,7 +324,7 @@ namespace SotAMapper
                             }
 
                             // delete temp file
-                            File.Delete(cpdTempFile);
+                            File.Delete(tempFilePath);
                         }
                         else
                             Log.WriteLine("no changes to CPD file since last check");
