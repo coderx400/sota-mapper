@@ -127,8 +127,10 @@ Testing Feedback, Suggestions, Bug Reports
 - zoom function
 - pre-canned Add functionality to save the need to type out common names for
   resource types, etc.
-- edit item, change name
-- remove item for accidentally added items
+- edit item, change name, remove item for accidentally added items or typos
+- add separate field in map .csv file for symbol, allowing independently setting
+  the name and symbol to allow re-using a single symbol for multiple differently
+  named items, for example towns
 
 ################################################################################
 # History
