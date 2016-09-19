@@ -16,7 +16,9 @@ lollie
    Bank
    Beast
    Camp
+   Clay
    Coal
+   Copper
    Dungeon
    Garlic
    Gem
@@ -24,6 +26,7 @@ lollie
    Graveyard
    House
    Humanoid
+   Iron
    Mandrake
    Ore
    Pearl
