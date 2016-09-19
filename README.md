@@ -142,6 +142,9 @@ NEXT VERSION
 - empty map file is now tolerated and handled correctly, this allows running
   the app with an empty map file and adding all items using the Add button and
   now (for real this time!) never having to manually enter any coordinates
+- fixed a bug with date/time parsing from log file entries which prevented
+  it from working on a machine whose date/time locale was not compatible
+  by default with the format used in the SotA log file
 
 2016.09.11, v1.3
 - added TopMost checkbox, checking it will attempt to keep the window on top
