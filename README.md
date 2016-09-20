@@ -134,7 +134,7 @@ If a .PNG file is present in the "data/icons" directory which matches the name
 of the item in the map data .csv file, then the image will be shown instead.
 
 ################################################################################
-# Contributors
+# Contributors - SotAMapper team
 ################################################################################
 
 Project Creator, Programmer
@@ -159,11 +159,15 @@ Testing Feedback, Suggestions, Bug Reports
     lollie
     moko
     Umuri
+    Womby
                                         
 ################################################################################
 # Known Issues
 ################################################################################
 
+- one user reported running for a long time and eventually having SotAMapper
+  appear to be "stuck" on a single map, but could not later reproduce this,
+  and so this may or may not be an issue still out there
 
 ################################################################################
 # Feature Requests
@@ -180,6 +184,17 @@ Testing Feedback, Suggestions, Bug Reports
 - add separate field in map .csv file for symbol, allowing independently setting
   the name and symbol to allow re-using a single symbol for multiple differently
   named items, for example towns
+- support map files with the full name, area and map as reported by /loc, as
+  currently all POTs have the same map name but different area names and this
+  would allow having different maps (for player run quests for example) for
+  different POTs built on the same template
+- allow specifying text color for map items, and/or allow defining named colors
+  in which case the name could be used instead of the color value
+     Well, 242.239, 89.40163, -198.2776,0x0000FF
+     or...
+     Color,POI,0x0000FF
+     Well, 242.239, 89.40163, -198.2776,POI
+- layer support so you could toggle on/off items of a certain color/category
 
 ################################################################################
 # History
