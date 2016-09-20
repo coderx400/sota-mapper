@@ -76,9 +76,52 @@ in coordinate values!
 If you have Excel installed, you can double-click on the .csv files and edit
 them in that, just make sure to save them out as .csv if prompted.
 
-Some maps have been reported as being incorrectly rotated when displayed.  If
-that happens for a map, add the below line somewhere in the map .csv file
-and it should rotate the data for you
+--- MAP COORD SYS --------------------------------------------------------------
+
+Different maps in SotA have different coordinate systems.  If things don't
+appear at the correct orientation in SotAMapper its possible the wrong coord
+sys is being used.  To figure this out, turn on /loctrack and see which of
+the below applies.  The letters on the below indicate positive direction.
+So you can walk north while watching the loc values and then do the same thing
+walking east and figure out which one it is.  Here are the possible choices.
+
+```
+        //
+        //       X
+        //       |
+        //       |
+        //  Z----*
+        //
+        XZ_NorthWest,
+
+        //
+        //  Z
+        //  |
+        //  |
+        //  *----X
+        //
+        ZX_NorthEast,
+
+        //
+        //  *----Z
+        //  |
+        //  |
+        //  X
+        //
+        ZX_EastSouth,
+
+        //
+        //  X----*
+        //       |
+        //       |
+        //       Z
+        //
+        ZX_SouthWest
+```
+
+Once you figure out which one is in use, add a line like the below somewhere in
+the map .csv file.  That will specify which coord sys to use for that map.  The
+default, if not specified, is XZ_NorthWest.
 
 ```
 MapCoordSys,ZX_NorthEast
@@ -141,6 +184,10 @@ Testing Feedback, Suggestions, Bug Reports
 ################################################################################
 # History
 ################################################################################
+
+NEXT VERSION
+- added two additional coordinate systems, both rotated an additional 90 degs
+  from the previous, now all 4 possible cases are covered
 
 2016.09.19, v1.5
 - added support for specifying one of two coordinate systems in a map file to

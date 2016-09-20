@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SotAMapper
 {
@@ -32,7 +30,15 @@ namespace SotAMapper
         //  |
         //  X
         //
-        ZX_EastSouth
+        ZX_EastSouth,
+
+        //
+        //  X----*
+        //       |
+        //       |
+        //       Z
+        //
+        ZX_SouthWest
     }
 
     /// <summary>

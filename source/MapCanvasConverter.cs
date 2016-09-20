@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace SotAMapper
@@ -96,6 +93,11 @@ namespace SotAMapper
                 mapWidth = (double)(maxZ - minZ);
                 mapHeight = (double)(maxX - minX);
             }
+            else if (_map.MapCoordSys == CoordSysType.ZX_SouthWest)
+            {
+                mapWidth = (double)(maxX - minX);
+                mapHeight = (double)(maxZ - minZ);
+            }
             else
             {
                 return false;
@@ -135,6 +137,11 @@ namespace SotAMapper
                 _mapUpperLeftX = (double)minX.GetValueOrDefault();
                 _mapUpperLeftZ = (double)minZ.GetValueOrDefault();
             }
+            else if (_map.MapCoordSys == CoordSysType.ZX_SouthWest)
+            {
+                _mapUpperLeftX = (double)maxX.GetValueOrDefault();
+                _mapUpperLeftZ = (double)minZ.GetValueOrDefault();
+            }
             else
             {
                 return false;
@@ -169,6 +176,11 @@ namespace SotAMapper
             {
                 canvasX = (mapLoc.Z - _mapUpperLeftZ) * _mapToCanvasScale;
                 canvasY = (mapLoc.X - _mapUpperLeftX) * _mapToCanvasScale;
+            }
+            else if (_map.MapCoordSys == CoordSysType.ZX_SouthWest)
+            {
+                canvasX = -(mapLoc.X - _mapUpperLeftX) * _mapToCanvasScale;
+                canvasY = (mapLoc.Z - _mapUpperLeftZ) * _mapToCanvasScale;
             }
             else
             {
