@@ -24,7 +24,15 @@ namespace SotAMapper
         //  |
         //  *----X
         //
-        ZX_NorthEast
+        ZX_NorthEast,
+
+        //
+        //  *----Z
+        //  |
+        //  |
+        //  X
+        //
+        ZX_EastSouth
     }
 
     /// <summary>
@@ -60,6 +68,8 @@ namespace SotAMapper
             var sb = new StringBuilder();
 
             sb.Append("Name=" + (Name ?? "null") + "\n");
+
+            sb.Append("MapCoordSys=" + MapCoordSys + "\n");
 
             sb.Append("   MinLoc: " + (MinLoc?.ToString() ?? "null") + "\n");
             sb.Append("   MaxLoc: " + (MaxLoc?.ToString() ?? "null") + "\n");
