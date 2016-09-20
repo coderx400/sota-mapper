@@ -79,8 +79,22 @@ namespace SotAMapper
                 }
             }
 
-            double mapWidth = (double)(maxZ - minZ);
-            double mapHeight = (double)(maxX - minX);
+            double mapWidth = 0;
+            double mapHeight = 0;
+            if (_map.MapCoordSys == CoordSysType.XZ_NorthWest)
+            {
+                mapWidth = (double)(maxZ - minZ);
+                mapHeight = (double)(maxX - minX);
+            }
+            else if (_map.MapCoordSys == CoordSysType.ZX_NorthEast)
+            {
+                mapWidth = (double)(maxX - minX);
+                mapHeight = (double)(maxZ - minZ);
+            }
+            else
+            {
+                return false;
+            }
 
             // determine render size
 
@@ -101,8 +115,20 @@ namespace SotAMapper
             // extreme corner of map data (north west corner) used
             // to translate the map to the canvas origin (upper left)
 
-            _mapUpperLeftX = (double)maxX.GetValueOrDefault();
-            _mapUpperLeftZ = (double)maxZ.GetValueOrDefault();
+            if (_map.MapCoordSys == CoordSysType.XZ_NorthWest)
+            {
+                _mapUpperLeftX = (double)maxX.GetValueOrDefault();
+                _mapUpperLeftZ = (double)maxZ.GetValueOrDefault();
+            }
+            else if (_map.MapCoordSys == CoordSysType.ZX_NorthEast)
+            {
+                _mapUpperLeftX = (double)minX.GetValueOrDefault();
+                _mapUpperLeftZ = (double)maxZ.GetValueOrDefault();
+            }
+            else
+            {
+                return false;
+            }
 
             return true;
         }
@@ -119,8 +145,22 @@ namespace SotAMapper
 
             // scale map loc to canvas, reverse direction, and map Z=>X and X=>Y
 
-            canvasX = -(mapLoc.Z - _mapUpperLeftZ) * _mapToCanvasScale;
-            canvasY = -(mapLoc.X - _mapUpperLeftX) * _mapToCanvasScale;
+            if (_map.MapCoordSys == CoordSysType.XZ_NorthWest)
+            {
+                canvasX = -(mapLoc.Z - _mapUpperLeftZ)*_mapToCanvasScale;
+                canvasY = -(mapLoc.X - _mapUpperLeftX)*_mapToCanvasScale;
+            }
+            else if (_map.MapCoordSys == CoordSysType.ZX_NorthEast)
+            {
+                canvasX = (mapLoc.X - _mapUpperLeftX)*_mapToCanvasScale;
+                canvasY = -(mapLoc.Z - _mapUpperLeftZ)*_mapToCanvasScale;
+            }
+            else
+            {
+                canvasX = _canvas.ActualWidth / 2.0;
+                canvasY = _canvas.ActualHeight / 2.0;
+                return;
+            }
 
             // add render margin offfset
 

@@ -7,6 +7,26 @@ using System.Threading.Tasks;
 
 namespace SotAMapper
 {
+    // used to indicate which coord sys is in use for the map
+    public enum CoordSysType
+    {
+        //
+        //       X
+        //       |
+        //       |
+        //  Z----*
+        //
+        XZ_NorthWest,
+
+        //
+        //  Z
+        //  |
+        //  |
+        //  *----X
+        //
+        ZX_NorthEast
+    }
+
     /// <summary>
     /// Represents a single map loaded from a map data .csv file in "data/maps".
     /// Map data files have name,x,y,z
@@ -20,6 +40,8 @@ namespace SotAMapper
         /// and what is reported by the /loc command
         /// </summary>
         public string Name { get; private set; }
+
+        public CoordSysType MapCoordSys { get; private set; }
 
         private List<MapItem> _items;
 
@@ -63,6 +85,7 @@ namespace SotAMapper
 
                 MapFilePath = mapFile;
                 Name = Path.GetFileNameWithoutExtension(mapFile);
+                MapCoordSys = CoordSysType.XZ_NorthWest;
                 _items = new List<MapItem>();
                 MinLoc = null;
                 MaxLoc = null;
@@ -75,32 +98,45 @@ namespace SotAMapper
                 {
                     var toks = line.Split(',');
 
-                    if (toks.Length != 4)
-                        continue;
-
-                    float x, y, z;
-                    if (!float.TryParse(toks[1], out x) ||
-                        !float.TryParse(toks[2], out y) ||
-                        !float.TryParse(toks[3], out z))
+                    if (toks.Length == 2)
                     {
-                        continue;
+                        if (string.Compare(toks[0].Trim(), "MapCoordSys", true) == 0)
+                        {
+                            CoordSysType tmp;
+                            if (CoordSysType.TryParse(toks[1].Trim(), true, out tmp))
+                            {
+                                MapCoordSys = tmp;
+                                Log.WriteLine("coord sys specified: " + MapCoordSys);
+                            }
+                        }
                     }
 
-                    var itemName = toks[0].Trim();
-                    if (itemName?.Length == 0)
-                        continue;
-
-                    var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
-                    _items.Add(mapItem);
-
-                    if (_items.Count <= maxNumItemsToLog)
+                    else if (toks.Length == 4)
                     {
-                        Log.WriteLine($"loaded map item: {mapItem}");
-                    }
+                        float x, y, z;
+                        if (!float.TryParse(toks[1], out x) ||
+                            !float.TryParse(toks[2], out y) ||
+                            !float.TryParse(toks[3], out z))
+                        {
+                            continue;
+                        }
 
-                    if (_items.Count == (maxNumItemsToLog + 1))
-                    {
-                        Log.WriteLine("... remaining items not logged");
+                        var itemName = toks[0].Trim();
+                        if (itemName?.Length == 0)
+                            continue;
+
+                        var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
+                        _items.Add(mapItem);
+
+                        if (_items.Count <= maxNumItemsToLog)
+                        {
+                            Log.WriteLine($"loaded map item: {mapItem}");
+                        }
+
+                        if (_items.Count == (maxNumItemsToLog + 1))
+                        {
+                            Log.WriteLine("... remaining items not logged");
+                        }
                     }
                 }
 

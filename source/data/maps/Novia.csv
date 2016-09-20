@@ -1,5 +1,6 @@
 # Novia overland map
 # contributors: LiquidSky
+MapCoordSys,ZX_NorthEast
 Name,X,Y,Z
 Center, 0, 0, 0
 Estgard, -334.5354, 12.39285, 299.4277
