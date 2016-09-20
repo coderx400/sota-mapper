@@ -200,6 +200,9 @@ Testing Feedback, Suggestions, Bug Reports
 # History
 ################################################################################
 
+NEXT VERSION
+- relaxed map .csv parsing to account for Excel saving with extra empty fields
+
 2016.09.20, v1.6
 - added two additional coordinate systems, both rotated an additional 90 degs
   from the previous, now all 4 possible cases are covered

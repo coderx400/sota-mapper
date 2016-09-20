@@ -114,32 +114,25 @@ namespace SotAMapper
                 {
                     var toks = line.Split(',');
 
-                    if (toks.Length == 2)
+                    float x = 0, y = 0, z = 0;
+
+                    if ((toks.Length >= 2) &&
+                        (string.Compare(toks[0].Trim(), "MapCoordSys", true) == 0))
                     {
-                        if (string.Compare(toks[0].Trim(), "MapCoordSys", true) == 0)
+                        CoordSysType tmp;
+                        if (CoordSysType.TryParse(toks[1].Trim(), true, out tmp))
                         {
-                            CoordSysType tmp;
-                            if (CoordSysType.TryParse(toks[1].Trim(), true, out tmp))
-                            {
-                                MapCoordSys = tmp;
-                                Log.WriteLine("coord sys specified: " + MapCoordSys);
-                            }
+                            MapCoordSys = tmp;
+                            Log.WriteLine("coord sys specified: " + MapCoordSys);
                         }
                     }
-
-                    else if (toks.Length == 4)
+                    else if ((toks.Length >= 4) &&
+                        (toks[0].Trim().Length > 0) &&
+                        float.TryParse(toks[1].Trim(), out x) &&
+                        float.TryParse(toks[2].Trim(), out y) &&
+                        float.TryParse(toks[3].Trim(), out z))
                     {
-                        float x, y, z;
-                        if (!float.TryParse(toks[1], out x) ||
-                            !float.TryParse(toks[2], out y) ||
-                            !float.TryParse(toks[3], out z))
-                        {
-                            continue;
-                        }
-
                         var itemName = toks[0].Trim();
-                        if (itemName?.Length == 0)
-                            continue;
 
                         var mapItem = new MapItem(itemName, new MapCoord(x, y, z));
                         _items.Add(mapItem);
