@@ -76,6 +76,14 @@ in coordinate values!
 If you have Excel installed, you can double-click on the .csv files and edit
 them in that, just make sure to save them out as .csv if prompted.
 
+Some maps have been reported as being incorrectly rotated when displayed.  If
+that happens for a map, add the below line somewhere in the map .csv file
+and it should rotate the data for you
+
+```
+MapCoordSys,ZX_NorthEast
+```
+
 --- MAP ICONS ------------------------------------------------------------------
 
 By default, map items are rendered as text labels with dots at the map location.
@@ -113,8 +121,6 @@ Testing Feedback, Suggestions, Bug Reports
 # Known Issues
 ################################################################################
 
-- some maps seem to have reversed coordinate systems, Berek confirmed that this
-  is to be expected for some of the maps  
 
 ################################################################################
 # Feature Requests
@@ -135,6 +141,10 @@ Testing Feedback, Suggestions, Bug Reports
 ################################################################################
 # History
 ################################################################################
+
+2016.09.19, v1.5
+- added support for specifying one of two coordinate systems in a map file to
+  address the issue of maps being incorrectly rotated
 
 2016.09.19, v1.4
 - data updates
