@@ -155,6 +155,7 @@ Testing Feedback, Suggestions, Bug Reports
     cartodude
     Frostll
     Kabalyero
+    Link_of_Hyrule
     LiquidSky
     lollie
     moko
@@ -167,7 +168,9 @@ Testing Feedback, Suggestions, Bug Reports
 
 - one user reported running for a long time and eventually having SotAMapper
   appear to be "stuck" on a single map, but could not later reproduce this,
-  and so this may or may not be an issue still out there
+  and so this may or may not be an issue still out there -- UPDATE: It has also
+  been reported that after running for awhile, SotA stops updating its log files
+  which may explain this issue
 
 ################################################################################
 # Feature Requests
