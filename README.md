@@ -200,7 +200,7 @@ Testing Feedback, Suggestions, Bug Reports
 # History
 ################################################################################
 
-NEXT VERSION
+2016.09.21, v1.7
 - relaxed map .csv parsing to account for Excel saving with extra empty fields
 
 2016.09.20, v1.6
